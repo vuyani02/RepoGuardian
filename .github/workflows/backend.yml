@@ -1,0 +1,38 @@
+name: Backend — Build & Test
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '9.4.2/aspnet-core/**'
+      - '.github/workflows/backend.yml'
+  pull_request:
+    branches: [master]
+    paths:
+      - '9.4.2/aspnet-core/**'
+      - '.github/workflows/backend.yml'
+
+jobs:
+  build-and-test:
+    name: Build & Test (.NET 8)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        working-directory: 9.4.2/aspnet-core
+        run: dotnet restore
+
+      - name: Build
+        working-directory: 9.4.2/aspnet-core
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test
+        working-directory: 9.4.2/aspnet-core
+        run: dotnet test --no-build --configuration Release --logger "console;verbosity=minimal"
