@@ -97,6 +97,8 @@ namespace FullStackProject.Domains.RepoGuardian
         {
             foreach (var result in results)
                 await _ruleResultRepo.InsertAsync(result);
+
+            await _unitOfWorkManager.Current.SaveChangesAsync();
         }
 
         public async Task<List<ComplianceScore>> CalculateAndSaveScoresAsync(Guid scanRunId, List<RuleResult> results)
@@ -128,6 +130,8 @@ namespace FullStackProject.Domains.RepoGuardian
             var scanRun = await _scanRunRepo.GetAsync(scanRunId);
             scanRun.OverallScore = overallScore;
             await _scanRunRepo.UpdateAsync(scanRun);
+
+            await _unitOfWorkManager.Current.SaveChangesAsync();
 
             return scores;
         }
