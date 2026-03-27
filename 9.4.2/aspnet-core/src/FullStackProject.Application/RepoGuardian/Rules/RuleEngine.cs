@@ -41,6 +41,15 @@ namespace FullStackProject.RepoGuardian.Rules
                     paths.Any(p => p.Contains("/test/") || p.Contains("/tests/") || p.Contains("/__tests__/")
                                    || p.Contains(".test.") || p.Contains(".spec.")
                                    || p.StartsWith("test/") || p.StartsWith("tests/"))),
+
+                // ── CI/CD ─────────────────────────────────────────────────────
+                Check(scanRunId, "CICD_001", "CI/CD pipeline configured", RuleCategory.CiCd,
+                    paths.Any(p => p.StartsWith(".github/workflows/")
+                                   || p.Contains(".gitlab-ci")
+                                   || p.Contains("jenkinsfile")
+                                   || p.StartsWith(".circleci/")
+                                   || p.Contains("azure-pipelines")
+                                   || p.Contains(".travis.yml"))),
             };
         }
 
