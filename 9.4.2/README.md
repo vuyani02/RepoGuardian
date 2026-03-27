@@ -29,7 +29,7 @@ Create & download your project from https://aspnetboilerplate.com/Templates
 
 # Domain Model
 
-![Domain Model](aspnet-core/_screenshots/domain-model.png.png)
+![Domain Model](aspnet-core/_screenshots/domain-model.png)
 
 [View Domain Model on Lucidchart](https://lucid.app/lucidspark/eb6fa5db-38e6-4c1e-a748-38510f2f0fdf/edit?viewport_loc=1600%2C-7930%2C3546%2C1699%2C0_0&invitationId=inv_6b02bda1-d24a-4f11-870d-08f6a6a5bb9d)
 
