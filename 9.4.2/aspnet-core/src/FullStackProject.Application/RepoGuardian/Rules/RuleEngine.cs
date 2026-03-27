@@ -28,6 +28,10 @@ namespace FullStackProject.RepoGuardian.Rules
                 Check(scanRunId, "DOC_001", "README exists", RuleCategory.Documentation,
                     paths.Any(p => p == "readme.md" || p == "readme.txt" || p == "readme"
                                    || p.EndsWith("/readme.md") || p.EndsWith("/readme.txt"))),
+
+                Check(scanRunId, "DOC_002", "LICENSE exists", RuleCategory.Documentation,
+                    paths.Any(p => p == "license" || p == "license.md" || p == "license.txt"
+                                   || p.EndsWith("/license") || p.EndsWith("/license.md") || p.EndsWith("/license.txt"))),
             };
         }
 
