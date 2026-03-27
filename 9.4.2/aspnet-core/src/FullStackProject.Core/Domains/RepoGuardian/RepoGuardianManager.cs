@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Abp.Domain.Repositories;
 using Abp.Domain.Services;
+using Abp.Domain.Uow;
 using Abp.UI;
 
 namespace FullStackProject.Domains.RepoGuardian
@@ -15,19 +16,22 @@ namespace FullStackProject.Domains.RepoGuardian
         private readonly IRepository<RuleResult, Guid> _ruleResultRepo;
         private readonly IRepository<ComplianceScore, Guid> _complianceScoreRepo;
         private readonly IRepository<Recommendation, Guid> _recommendationRepo;
+        private readonly IUnitOfWorkManager _unitOfWorkManager;
 
         public RepoGuardianManager(
             IRepository<GithubRepository, Guid> repositoryRepo,
             IRepository<ScanRun, Guid> scanRunRepo,
             IRepository<RuleResult, Guid> ruleResultRepo,
             IRepository<ComplianceScore, Guid> complianceScoreRepo,
-            IRepository<Recommendation, Guid> recommendationRepo)
+            IRepository<Recommendation, Guid> recommendationRepo,
+            IUnitOfWorkManager unitOfWorkManager)
         {
             _repositoryRepo = repositoryRepo;
             _scanRunRepo = scanRunRepo;
             _ruleResultRepo = ruleResultRepo;
             _complianceScoreRepo = complianceScoreRepo;
             _recommendationRepo = recommendationRepo;
+            _unitOfWorkManager = unitOfWorkManager;
         }
 
         public (string owner, string name) ParseGithubUrl(string githubUrl)
@@ -61,12 +65,18 @@ namespace FullStackProject.Domains.RepoGuardian
 
         public async Task<ScanRun> CreateScanRunAsync(Guid repositoryId)
         {
-            return await _scanRunRepo.InsertAsync(new ScanRun
+            var scanRun = await _scanRunRepo.InsertAsync(new ScanRun
             {
                 RepositoryId = repositoryId,
                 Status = ScanRunStatus.Pending,
                 TriggeredAt = DateTime.UtcNow
             });
+
+            // Flush to DB immediately so subsequent GetAsync calls within the same
+            // Unit of Work can find the record by ID.
+            await _unitOfWorkManager.Current.SaveChangesAsync();
+
+            return scanRun;
         }
 
         public async Task UpdateScanStatusAsync(Guid scanRunId, ScanRunStatus status, string errorMessage = null)
