@@ -53,7 +53,8 @@ namespace FullStackProject.RepoGuardian.Rules
                                    || p.Contains(".travis.yml"))),
 
                 Check(scanRunId, "CICD_002", "Linting or formatting configuration exists", RuleCategory.CiCd,
-                    paths.Any(p => p.Contains(".eslintrc") || p.Contains(".pylintrc") || p.Contains(".rubocop")
+                    paths.Any(p => p.Contains(".eslintrc") || p.Contains("eslint.config.")
+                                   || p.Contains(".pylintrc") || p.Contains(".rubocop")
                                    || p.Contains(".editorconfig") || p.Contains("stylecop")
                                    || p.Contains(".flake8") || p.Contains("prettierrc")
                                    || p.Contains(".stylelintrc"))),
