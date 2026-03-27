@@ -8,8 +8,9 @@ export async function POST(req: NextRequest) {
     await abpApi.post('/api/services/app/Account/Register', body)
 
     return NextResponse.json({ success: true })
-  } catch (err: any) {
-    const message = err?.response?.data?.error?.message || 'Registration failed. Please try again.'
+  } catch (err) {
+    const error = err as { response?: { data?: { error?: { message?: string } } } }
+    const message = error?.response?.data?.error?.message || 'Registration failed. Please try again.'
     return NextResponse.json({ message }, { status: 400 })
   }
 }

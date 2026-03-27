@@ -15,9 +15,10 @@ export async function POST(req: NextRequest) {
     await createSession(data.result.userId, data.result.accessToken)
 
     return NextResponse.json({ success: true })
-  } catch (err: any) {
-    const message = err?.response?.data?.error?.message || 'Invalid username or password.'
-    const status = err?.response?.status === 401 ? 401 : 500
+  } catch (err) {
+    const error = err as { response?: { data?: { error?: { message?: string } }; status?: number } }
+    const message = error?.response?.data?.error?.message || 'Invalid username or password.'
+    const status = error?.response?.status === 401 ? 401 : 500
     return NextResponse.json({ message }, { status })
   }
 }
