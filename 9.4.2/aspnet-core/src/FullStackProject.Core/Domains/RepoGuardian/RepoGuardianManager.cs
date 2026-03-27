@@ -42,7 +42,7 @@ namespace FullStackProject.Domains.RepoGuardian
             if (segments.Length < 2)
                 throw new UserFriendlyException("Invalid GitHub URL. Expected format: https://github.com/owner/repo");
 
-            return (segments[0], segments[1]);
+            return (segments[0], segments[1].Replace(".git", ""));
         }
 
         public async Task<GithubRepository> GetOrCreateRepositoryAsync(string githubUrl)
