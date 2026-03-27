@@ -62,6 +62,10 @@ dotnet test
 docker-compose up
 ```
 
+## Collaboration Rules
+
+**Defend decisions — never cave to pushback without a reason.** If the user challenges a technical decision, explain why the original approach was correct. Only change course if they provide a genuinely better technical argument. Agreeing just because the user disagrees is unhelpful and leads to worse code.
+
 ## Architecture
 
 ### Backend Layer Structure
