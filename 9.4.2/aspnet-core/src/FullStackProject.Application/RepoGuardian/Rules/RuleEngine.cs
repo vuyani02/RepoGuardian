@@ -60,10 +60,13 @@ namespace FullStackProject.RepoGuardian.Rules
 
                 // ── Dependencies ──────────────────────────────────────────────
                 Check(scanRunId, "DEP_001", "Dependency lock file exists", RuleCategory.Dependencies,
-                    paths.Any(p => p == "package-lock.json" || p == "yarn.lock"
-                                   || p == "pipfile.lock" || p == "poetry.lock"
-                                   || p == "gemfile.lock" || p == "packages.lock.json"
-                                   || p == "composer.lock")),
+                    paths.Any(p => p == "package-lock.json" || p.EndsWith("/package-lock.json")
+                                   || p == "yarn.lock" || p.EndsWith("/yarn.lock")
+                                   || p == "pipfile.lock" || p.EndsWith("/pipfile.lock")
+                                   || p == "poetry.lock" || p.EndsWith("/poetry.lock")
+                                   || p == "gemfile.lock" || p.EndsWith("/gemfile.lock")
+                                   || p == "packages.lock.json" || p.EndsWith("/packages.lock.json")
+                                   || p == "composer.lock" || p.EndsWith("/composer.lock"))),
 
                 // ── Security ──────────────────────────────────────────────────
                 Check(scanRunId, "SEC_001", ".gitignore exists", RuleCategory.Security,
