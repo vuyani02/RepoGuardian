@@ -42,7 +42,8 @@ namespace FullStackProject.RepoGuardian.AI
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    Logger.WarnFormat("Grok API returned {0} for rule {1}", (int)response.StatusCode, failedRule.RuleId);
+                    var errorBody = await response.Content.ReadAsStringAsync();
+                    Logger.WarnFormat("Grok API returned {0} for rule {1}. Response: {2}", (int)response.StatusCode, failedRule.RuleId, errorBody);
                     return null;
                 }
 
@@ -50,7 +51,7 @@ namespace FullStackProject.RepoGuardian.AI
             }
             catch (Exception ex)
             {
-                Logger.Warn("Grok API call failed for rule " + failedRule.RuleId + ": " + ex.Message);
+                Logger.WarnFormat(ex, "Grok API call failed for rule {0}", failedRule.RuleId);
                 return null;
             }
         }
