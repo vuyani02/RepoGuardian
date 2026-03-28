@@ -8,7 +8,8 @@ const { Title, Paragraph } = Typography;
 
 const useStyles = createStyles(({ css }) => ({
   section: css`
-    min-height: calc(100vh - 64px);
+    min-height: 100vh;
+    padding-top: calc(80px + 64px);
     background: #ffffff;
     display: flex;
     align-items: center;

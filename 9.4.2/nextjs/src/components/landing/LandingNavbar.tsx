@@ -6,7 +6,13 @@ import Link from "next/link";
 
 const useStyles = createStyles(({ css }) => ({
   navbar: css`
-    background: #ffffff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
     border-bottom: 1px solid #f0f0f0;
     padding: 0 48px;
     height: 64px;
