@@ -96,6 +96,7 @@ namespace FullStackProject.RepoGuardian
                 await _repoGuardianManager.UpdateScanStatusAsync(scanRun.Id, ScanRunStatus.Running);
 
                 var repository = await _repositoryRepo.GetAsync(request.RepositoryId);
+                Logger.Info("StartScan: owner='" + repository.Owner + "' name='" + repository.Name + "'");
                 var filePaths = await _githubService.GetFileTreeAsync(repository.Owner, repository.Name);
 
                 var ruleResults = _ruleEngine.Evaluate(scanRun.Id, filePaths);
