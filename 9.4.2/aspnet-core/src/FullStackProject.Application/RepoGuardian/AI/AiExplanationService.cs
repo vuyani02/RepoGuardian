@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 namespace FullStackProject.RepoGuardian.AI
 {
     /// <summary>
-    /// Calls the Grok API to generate a human-readable explanation and fix suggestion for a failed compliance rule.
+    /// Calls the Gemini API to generate a human-readable explanation and fix suggestion for a failed compliance rule.
     /// </summary>
     public class AiExplanationService : ITransientDependency
     {
@@ -23,11 +23,11 @@ namespace FullStackProject.RepoGuardian.AI
         public AiExplanationService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
-            _model = configuration["Grok:Model"] ?? "grok-3-mini";
+            _model = configuration["Gemini:Model"] ?? "gemini-2.0-flash";
         }
 
         /// <summary>
-        /// Returns a Recommendation for a failed rule, or null if the Grok API call fails.
+        /// Returns a Recommendation for a failed rule, or null if the Gemini API call fails.
         /// A failed AI call must never fail the overall scan.
         /// </summary>
         public async Task<Recommendation> GetRecommendationAsync(RuleResult failedRule, string owner, string repo)
@@ -37,13 +37,13 @@ namespace FullStackProject.RepoGuardian.AI
                 Logger.InfoFormat("Requesting AI recommendation for rule {0} on {1}/{2}", failedRule.RuleId, owner, repo);
 
                 var content = BuildRequestContent(failedRule, owner, repo);
-                var client = _httpClientFactory.CreateClient("Grok");
+                var client = _httpClientFactory.CreateClient("Gemini");
                 var response = await client.PostAsync("chat/completions", content);
 
                 if (!response.IsSuccessStatusCode)
                 {
                     var errorBody = await response.Content.ReadAsStringAsync();
-                    Logger.WarnFormat("Grok API returned {0} for rule {1}. Response: {2}", (int)response.StatusCode, failedRule.RuleId, errorBody);
+                    Logger.WarnFormat("Gemini API returned {0} for rule {1}. Response: {2}", (int)response.StatusCode, failedRule.RuleId, errorBody);
                     return null;
                 }
 
@@ -51,7 +51,7 @@ namespace FullStackProject.RepoGuardian.AI
             }
             catch (Exception ex)
             {
-                Logger.WarnFormat(ex, "Grok API call failed for rule {0}", failedRule.RuleId);
+                Logger.WarnFormat(ex, "Gemini API call failed for rule {0}", failedRule.RuleId);
                 return null;
             }
         }
