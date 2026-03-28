@@ -10,7 +10,7 @@ Stack:
 - **Backend**: ASP.NET Boilerplate (ABP) v9.4.1 on ASP.NET Core 8 (`9.4.2/aspnet-core/`)
 - **Frontend**: Next.js 16 App Router with React 19, Ant Design (`9.4.2/nextjs/`)
 - **Database**: PostgreSQL
-- **AI**: Grok API (xAI) — not Claude/OpenAI, user does not have budget for those
+- **AI**: Gemini API (`gemini-2.5-flash`, OpenAI-compatible endpoint) via Google AI Studio
 
 ## Commands
 
@@ -89,23 +89,49 @@ docker-compose up
 | SEC_002 | No .env files committed | Security |
 | SEC_003 | Security policy or CODEOWNERS exists | Security |
 
-### Phase 2 — AI Recommendations (Grok)
+### Phase 2 — AI Recommendations ✅ DONE
 
-- `AiExplanationService` — calls Grok API for each failed rule
+- `AiExplanationService` — calls Gemini API for each failed rule
 - Returns: issue description, explanation, suggested fix
 - Saves `Recommendation` entities linked to `RuleResult`
 
-### Phase 3 — Frontend Dashboard
+### Phase 3 — Frontend
 
-- Login page → Dashboard page (Next.js App Router)
-- Add repository form → trigger scan → display results
-- Compliance score gauges per category + rule result list
-- Recommendations panel for failed rules
+Multi-tenancy model: each tenant = a company. All users under a tenant share the same repos and scan history. Repos are tenant-scoped (not user-scoped).
+
+#### Pages & Flow
+
+**Repositories page** (`/repositories`)
+- Lists all repos registered under the current tenant, with search and filters
+- Each row has a **Scan** button → spinner popup → full results popup on completion
+- Clicking a repo name navigates to the repo detail page
+
+**Repo detail page** (`/repositories/[id]`)
+- Shows repo metadata at the top
+- **Scan** button (same behaviour as above)
+- Table of all scans for that repo, sorted latest first
+- Each scan row has a **View** button → full results popup
+
+**Scans page** (`/scans`)
+- Lists all scans across all repos in the tenant, sorted latest first
+- Clicking any scan row → full results popup
+- **Scan** button → popup to select an existing repo from a dropdown OR enter a new GitHub URL → runs scan → full results popup on completion
+
+**Dashboard** (`/dashboard`)
+- Summary stats: overall compliance score, total repos, total scans
+- **Scan** button (same behaviour as scans page)
+
+**Full results popup** (shared component used everywhere)
+- Category score gauges (Documentation, Testing, CI/CD, Dependencies, Security)
+- Rule results table (rule name, category, passed/failed, details)
+- Recommendations panel for failed rules (issue description, explanation, suggested fix)
+
+#### Backend change required
+`GetRepositoriesAsync` currently filters by `UserId` — change to show all repos for the current tenant (remove the `UserId` filter, keep `UserId` on entity for audit only).
 
 ### Phase 4 — Polish & Deploy
 
 - Render.com deployment (backend + frontend)
-- Scan history per user
 - Public shareable scan report links
 
 ## Architecture
@@ -153,7 +179,7 @@ Auth uses **JWE cookies** (via `jose`) — tokens are encrypted server-side, not
 - Database: PostgreSQL (`Host=localhost;Port=5432;Database=FullStackProjectDb`)
 - JWT secret is in `appsettings.json` under `Authentication:JwtBearer:SecurityKey`
 - GitHub API base URL: `appsettings.json` under `GitHub:ApiBaseUrl`
-- Grok API key: to be added to `appsettings.json` under `Grok:ApiKey` (Phase 2)
+- Gemini API key: `appsettings.Development.json` under `Gemini:ApiKey` (gitignored); on Render set `Gemini__ApiKey` and `Gemini__Model` env vars
 
 ### Real-Time (SignalR)
 
