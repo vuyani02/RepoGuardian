@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Abp.Dependency;
 using Abp.UI;
+using Castle.Core.Logging;
 
 namespace FullStackProject.RepoGuardian.GitHub
 {
@@ -13,6 +14,8 @@ namespace FullStackProject.RepoGuardian.GitHub
     /// </summary>
     public class GithubService : ITransientDependency
     {
+        public ILogger Logger { get; set; } = NullLogger.Instance;
+
         private readonly IHttpClientFactory _httpClientFactory;
 
         public GithubService(IHttpClientFactory httpClientFactory)
@@ -25,9 +28,12 @@ namespace FullStackProject.RepoGuardian.GitHub
         /// </summary>
         public async Task<List<string>> GetFileTreeAsync(string owner, string repo)
         {
+            Logger.InfoFormat("Fetching file tree for {0}/{1}", owner, repo);
             var client = _httpClientFactory.CreateClient("GitHub");
             var defaultBranch = await GetDefaultBranchAsync(client, owner, repo);
-            return await GetTreePathsAsync(client, owner, repo, defaultBranch);
+            var paths = await GetTreePathsAsync(client, owner, repo, defaultBranch);
+            Logger.InfoFormat("Fetched {0} file paths from {1}/{2}", paths.Count, owner, repo);
+            return paths;
         }
 
         private async Task<string> GetDefaultBranchAsync(HttpClient client, string owner, string repo)
