@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Space, Tag, Typography } from "antd";
+import { Button, Space, Typography } from "antd";
 import { createStyles } from "antd-style";
 import Link from "next/link";
 
