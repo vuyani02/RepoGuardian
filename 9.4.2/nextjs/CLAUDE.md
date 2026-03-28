@@ -30,6 +30,24 @@ app/
 - Each component lives in its own file inside `components/`
 - Shared components used across multiple pages go in `src/components/`
 
+### Mobile Responsiveness
+
+Every page and component must be fully responsive. Use `antd-style` media queries inside `createStyles`:
+```tsx
+section: css`
+  padding: 80px 48px;
+
+  @media (max-width: 768px) {
+    padding: 48px 20px;
+  }
+`,
+```
+
+- Grids must collapse to a single column on small screens
+- Font sizes must scale down on mobile (use `clamp()` or media queries)
+- No fixed pixel widths that would overflow on small screens
+- Touch targets (buttons, links) must be at least 44px tall on mobile
+
 **Forbidden patterns:**
 - Multiple Axios instances
 - Inline styles or non-antd-style CSS
