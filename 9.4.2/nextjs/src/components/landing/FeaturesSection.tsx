@@ -9,6 +9,10 @@ const useStyles = createStyles(({ css }) => ({
   section: css`
     background: #ffffff;
     padding: 100px 48px;
+
+    @media (max-width: 768px) {
+      padding: 64px 20px;
+    }
   `,
   inner: css`
     max-width: 1100px;
@@ -39,6 +43,10 @@ const useStyles = createStyles(({ css }) => ({
     max-width: 560px;
     line-height: 1.7 !important;
     margin-bottom: 64px !important;
+
+    @media (max-width: 768px) {
+      max-width: none;
+    }
   `,
   grid: css`
     display: grid;
