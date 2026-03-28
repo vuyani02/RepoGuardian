@@ -56,6 +56,13 @@ namespace FullStackProject.Web.Host.Startup
                 client.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
             });
 
+            // Grok AI client
+            services.AddHttpClient("Grok", client =>
+            {
+                client.BaseAddress = new Uri(_appConfiguration["Grok:ApiBaseUrl"]);
+                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + _appConfiguration["Grok:ApiKey"]);
+            });
+
             // Configure CORS for angular2 UI
             services.AddCors(
                 options => options.AddPolicy(
