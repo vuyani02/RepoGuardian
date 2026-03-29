@@ -89,6 +89,7 @@ function handleClick() { ... }
 - Provider files outside the 4-file structure below
 - Under app folder only folders with page.ts must exist.
 - When ever you do something tell me what you are trying to do, don't just do.
+- Splitting a page into `page.tsx` + a separate `XxxContent` component when there is no server-side logic in `page.tsx`. Only split when `page.tsx` contains actual `async`/`await` work (data fetching, `verifySession`, etc.). If there is no server-side logic, put everything directly in `page.tsx`.
 
 ### Providers
 
