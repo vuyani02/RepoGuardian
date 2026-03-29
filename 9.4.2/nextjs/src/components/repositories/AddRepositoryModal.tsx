@@ -1,18 +1,8 @@
 'use client'
 
 import { Form, Input, Modal } from 'antd'
-import { createStyles } from 'antd-style'
 import { useRepositoryActions, useRepositoryState } from '@/providers/repositories'
-
-const useStyles = createStyles(({ css }) => ({
-  modalTitle: css`font-weight: 700;`,
-  form: css`margin-top: 16px;`,
-  input: css`border-radius: 10px !important;`,
-  okBtn: css`
-    background: #4f46e5 !important;
-    border-color: #4f46e5 !important;
-  `,
-}))
+import { useStyles } from './styles/AddRepositoryModal.style'
 
 interface Props {
   open: boolean
