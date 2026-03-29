@@ -2,10 +2,30 @@
 
 ### Styling
 
-All styles use `antd-style`'s `createStyles`, co-located as `app/<route>/style.ts`:
+All styles use `antd-style`'s `createStyles`. **No inline styles ever.**
+
+**Pages** — styles live in `app/<route>/style.ts` (same folder as `page.tsx`):
+```
+app/repositories/style.ts
+```
+
+**Components** — styles live in a `styles/` subfolder inside the component's feature folder, named `<ComponentName>.style.ts`:
+```
+src/components/repositories/styles/RepositoryTable.style.ts
+src/components/repositories/styles/AddRepositoryModal.style.ts
+src/components/app/styles/AppNavbar.style.ts
+src/components/landing/styles/HeroSection.style.ts
+```
+
+Each style file exports only `useStyles`:
+```ts
+import { createStyles } from 'antd-style'
+export const useStyles = createStyles(({ css }) => ({ ... }))
+```
+
+The component imports from its style file:
 ```tsx
-import { createStyles } from "antd-style";
-export const useStyles = createStyles(({ token }) => ({ ... }));
+import { useStyles } from './styles/MyComponent.style'
 ```
 
 ### antd
