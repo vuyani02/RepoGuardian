@@ -18,46 +18,46 @@ export enum RepositoryActionEnums {
   clearScanResult = 'CLEAR_SCAN_RESULT',
 }
 
-export const getRepositoriesPending = createAction<IRepositoryStateContext>(
+export const getRepositoriesPending = createAction<Partial<IRepositoryStateContext>>(
   RepositoryActionEnums.getRepositoriesPending,
   () => ({ isPending: true, isSuccess: false, isError: false })
 )
-export const getRepositoriesSuccess = createAction<IRepositoryStateContext, IRepository[]>(
+export const getRepositoriesSuccess = createAction<Partial<IRepositoryStateContext>, IRepository[]>(
   RepositoryActionEnums.getRepositoriesSuccess,
   (repositories) => ({ isPending: false, isSuccess: true, isError: false, repositories })
 )
-export const getRepositoriesError = createAction<IRepositoryStateContext>(
+export const getRepositoriesError = createAction<Partial<IRepositoryStateContext>>(
   RepositoryActionEnums.getRepositoriesError,
   () => ({ isPending: false, isSuccess: false, isError: true })
 )
 
-export const addRepositoryPending = createAction<IRepositoryStateContext>(
+export const addRepositoryPending = createAction<Partial<IRepositoryStateContext>>(
   RepositoryActionEnums.addRepositoryPending,
   () => ({ isAddPending: true })
 )
-export const addRepositorySuccess = createAction<IRepositoryStateContext, IRepository>(
+export const addRepositorySuccess = createAction<Partial<IRepositoryStateContext>, IRepository>(
   RepositoryActionEnums.addRepositorySuccess,
   (repo) => ({ isAddPending: false, repositories: undefined, _newRepo: repo })
 )
-export const addRepositoryError = createAction<IRepositoryStateContext>(
+export const addRepositoryError = createAction<Partial<IRepositoryStateContext>>(
   RepositoryActionEnums.addRepositoryError,
   () => ({ isAddPending: false })
 )
 
-export const startScanPending = createAction<IRepositoryStateContext, string>(
+export const startScanPending = createAction<Partial<IRepositoryStateContext>, string>(
   RepositoryActionEnums.startScanPending,
   (repositoryId) => ({ isScanPending: true, scanningRepositoryId: repositoryId })
 )
-export const startScanSuccess = createAction<IRepositoryStateContext, IScanResult>(
+export const startScanSuccess = createAction<Partial<IRepositoryStateContext>, IScanResult>(
   RepositoryActionEnums.startScanSuccess,
   (scanResult) => ({ isScanPending: false, scanningRepositoryId: undefined, scanResult })
 )
-export const startScanError = createAction<IRepositoryStateContext>(
+export const startScanError = createAction<Partial<IRepositoryStateContext>>(
   RepositoryActionEnums.startScanError,
   () => ({ isScanPending: false, scanningRepositoryId: undefined })
 )
 
-export const clearScanResult = createAction<IRepositoryStateContext>(
+export const clearScanResult = createAction<Partial<IRepositoryStateContext>>(
   RepositoryActionEnums.clearScanResult,
   () => ({ scanResult: undefined })
 )
