@@ -28,7 +28,9 @@ app/
 
 - `page.tsx` must only compose components — no inline UI logic
 - Each component lives in its own file inside `components/`
-- Shared components used across multiple pages go in `src/components/`
+- All components go in `src/components/<feature>/` — never inside the `app/` folder
+- Group by feature: `src/components/repositories/`, `src/components/auth/`, `src/components/landing/`, `src/components/app/`, etc.
+- `src/components/app/` is for shared layout components (navbar, sidebar, etc.)
 
 ### Mobile Responsiveness
 

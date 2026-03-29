@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import { Button, Typography } from 'antd'
-import { useStyles } from './style'
+import { useStyles } from '@/app/repositories/style'
 import { RepositoryProvider, useRepositoryActions, useRepositoryState } from '@/providers/repositories'
 import AppNavbar from '@/components/app/AppNavbar'
-import RepositoryTable from './components/RepositoryTable'
-import AddRepositoryModal from './components/AddRepositoryModal'
-import ScanResultModal from './components/ScanResultModal'
+import RepositoryTable from './RepositoryTable'
+import AddRepositoryModal from './AddRepositoryModal'
+import ScanResultModal from './ScanResultModal'
 
 const { Title } = Typography
 
