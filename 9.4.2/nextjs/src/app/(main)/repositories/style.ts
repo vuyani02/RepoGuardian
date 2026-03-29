@@ -29,6 +29,7 @@ export const useStyles = createStyles(({ css }) => ({
     border-radius: 14px;
     border: 1px solid #f3f4f6;
     overflow-x: auto;
+    overflow-y: clip;
   `,
   addBtn: css`
     background: #4f46e5 !important;
