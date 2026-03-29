@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Button, Typography } from 'antd'
-import { useStyles } from '@/app/(app)/repositories/style'
+import { useStyles } from '@/app/(main)/repositories/style'
 import { RepositoryProvider, useRepositoryActions, useRepositoryState } from '@/providers/repositories'
 import RepositoryTable from './RepositoryTable'
 import AddRepositoryModal from './AddRepositoryModal'

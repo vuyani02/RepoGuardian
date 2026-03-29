@@ -1,7 +1,7 @@
 'use client'
 
 import { Typography } from 'antd'
-import { useStyles } from '@/app/(app)/dashboard/style'
+import { useStyles } from '@/app/(main)/dashboard/style'
 
 const { Title, Text } = Typography
 

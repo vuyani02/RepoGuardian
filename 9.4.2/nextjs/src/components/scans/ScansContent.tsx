@@ -1,7 +1,7 @@
 'use client'
 
 import { Typography } from 'antd'
-import { useStyles } from '@/app/(app)/scans/style'
+import { useStyles } from '@/app/(main)/scans/style'
 
 const { Title, Text } = Typography
 
