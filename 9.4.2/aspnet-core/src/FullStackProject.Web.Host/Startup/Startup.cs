@@ -4,6 +4,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -38,10 +39,24 @@ namespace FullStackProject.Web.Host.Startup
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // Allow ABP's Abp.TenantId cookie to work on deployed HTTPS environments
-            // (Render and other platforms require SameSite=None; Secure for cross-site cookies)
+            // Render (and most cloud platforms) terminate TLS at the load balancer and forward
+            // requests to the app as HTTP. Without this, Request.IsHttps = false, which causes
+            // ASP.NET Core to omit the Secure flag on cookies — breaking SameSite=None cookies
+            // entirely (browsers silently reject SameSite=None without Secure).
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                // Trust all proxies — safe on Render where the app is not directly internet-facing
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+            });
+
+            // Ensure all cookies are SameSite=None; Secure so they work in cross-site contexts
+            // (e.g. Abp.TenantId cookie must reach the API from the frontend on a different domain)
             services.Configure<CookiePolicyOptions>(options =>
             {
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+                options.Secure = CookieSecurePolicy.Always;
                 options.OnAppendCookie = ctx =>
                 {
                     ctx.CookieOptions.SameSite = SameSiteMode.None;
@@ -115,6 +130,8 @@ namespace FullStackProject.Web.Host.Startup
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            // Must be first — makes Request.IsHttps = true when behind Render's HTTPS proxy
+            app.UseForwardedHeaders();
             app.UseCookiePolicy();
             app.UseAbp(options => { options.UseAbpRequestLocalization = false; }); // Initializes ABP framework.
 
