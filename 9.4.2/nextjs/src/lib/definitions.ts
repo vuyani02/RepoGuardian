@@ -1,5 +1,49 @@
 import { z } from 'zod'
 
+// ── Domain types ──────────────────────────────────────────────────────────────
+
+export interface IRepository {
+  id: string
+  githubUrl: string
+  owner: string
+  name: string
+}
+
+export interface IComplianceScore {
+  category: string
+  score: number
+}
+
+export interface IRuleResult {
+  ruleId: string
+  ruleName: string
+  category: string
+  passed: boolean
+  details: string
+}
+
+export interface IRecommendation {
+  ruleResultId: string
+  issueDescription: string
+  explanation: string
+  suggestedFix: string
+}
+
+export interface IScanResult {
+  scanRunId: string
+  status: string
+  overallScore: number | null
+  triggeredAt: string
+  completedAt: string | null
+  errorMessage: string | null
+  categoryScores: IComplianceScore[]
+  ruleResults: IRuleResult[]
+  recommendations: IRecommendation[]
+}
+
+// ── Auth schemas ──────────────────────────────────────────────────────────────
+
+
 export const LoginSchema = z.object({
   username: z.string().min(1, 'Username is required'),
   password: z.string().min(1, 'Password is required'),
@@ -15,7 +59,7 @@ export const RegisterSchema = z.object({
     .refine((val) => !val.includes('@'), {
       message: 'Username cannot be an email address',
     }),
-  emailAddress: z.string().email('Invalid email address'),
+  emailAddress: z.string().email({ message: 'Invalid email address' }),
   password: z
     .string()
     .min(8, 'Must be at least 8 characters')
