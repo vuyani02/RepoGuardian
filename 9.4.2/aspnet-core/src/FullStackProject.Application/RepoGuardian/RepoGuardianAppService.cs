@@ -136,6 +136,7 @@ namespace FullStackProject.RepoGuardian
                 Recommendations = recommendations.Select(r => new RecommendationDto
                 {
                     RuleResultId = r.RuleResultId,
+                    RuleId = ruleResults.FirstOrDefault(rr => rr.Id == r.RuleResultId)?.RuleId,
                     IssueDescription = r.IssueDescription,
                     Explanation = r.Explanation,
                     SuggestedFix = r.SuggestedFix
