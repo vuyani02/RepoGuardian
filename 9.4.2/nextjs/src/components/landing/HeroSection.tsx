@@ -101,7 +101,7 @@ const useStyles = createStyles(({ css }) => ({
   `,
 }));
 
-export default function HeroSection() {
+const HeroSection = () => {
   const { styles } = useStyles();
 
   return (
@@ -179,3 +179,5 @@ export default function HeroSection() {
     </section>
   );
 }
+
+export default HeroSection

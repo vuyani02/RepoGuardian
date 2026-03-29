@@ -6,7 +6,7 @@ import CtaBanner from "@/components/landing/CtaBanner";
 import LandingFooter from "@/components/landing/LandingFooter";
 import StyleWrapper from "./StyleWrapper";
 
-export default function Home() {
+const Home = () => {
   return (
     <StyleWrapper>
       <LandingNavbar />
@@ -18,3 +18,5 @@ export default function Home() {
     </StyleWrapper>
   );
 }
+
+export default Home

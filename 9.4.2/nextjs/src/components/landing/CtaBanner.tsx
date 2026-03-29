@@ -94,7 +94,7 @@ const useStyles = createStyles(({ css }) => ({
   `,
 }));
 
-export default function CtaBanner() {
+const CtaBanner = () => {
   const { styles } = useStyles();
 
   return (
@@ -122,3 +122,5 @@ export default function CtaBanner() {
     </section>
   );
 }
+
+export default CtaBanner

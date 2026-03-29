@@ -6,7 +6,7 @@ import { useStyles } from './style'
 
 const { Title, Text } = Typography
 
-export default function DashboardContent({ userId }: { userId: number }) {
+const DashboardContent = ({ userId }: { userId: number }) => {
   const { styles } = useStyles()
 
   return (
@@ -19,3 +19,5 @@ export default function DashboardContent({ userId }: { userId: number }) {
     </div>
   )
 }
+
+export default DashboardContent

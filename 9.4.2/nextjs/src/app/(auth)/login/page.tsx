@@ -11,7 +11,7 @@ type LoginValues = {
   password: string
 }
 
-function ShieldIcon() {
+const ShieldIcon = () => {
   return (
     <svg width="30" height="30" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -26,7 +26,7 @@ function ShieldIcon() {
   )
 }
 
-function LoginForm() {
+const LoginForm = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
@@ -34,7 +34,7 @@ function LoginForm() {
   const justRegistered = searchParams.get('registered') === 'true'
   const { styles } = useStyles()
 
-  async function onFinish(values: LoginValues) {
+  const onFinish = async (values: LoginValues) => {
     setLoading(true)
     setError(null)
     try {
@@ -151,10 +151,12 @@ function LoginForm() {
   )
 }
 
-export default function LoginPage() {
+const LoginPage = () => {
   return (
     <Suspense>
       <LoginForm />
     </Suspense>
   )
 }
+
+export default LoginPage

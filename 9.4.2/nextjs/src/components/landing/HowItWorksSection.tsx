@@ -134,7 +134,7 @@ const steps = [
   },
 ];
 
-export default function HowItWorksSection() {
+const HowItWorksSection = () => {
   const { styles } = useStyles();
 
   return (
@@ -165,3 +165,5 @@ export default function HowItWorksSection() {
     </section>
   );
 }
+
+export default HowItWorksSection

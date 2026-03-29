@@ -144,19 +144,19 @@ const useStyles = createStyles(({ css }) => ({
   `,
 }))
 
-function scoreVariant(score: number): 'green' | 'amber' | 'red' {
+const scoreVariant = (score: number): 'green' | 'amber' | 'red' => {
   if (score >= 80) return 'green'
   if (score >= 50) return 'amber'
   return 'red'
 }
 
-function scoreHex(score: number): string {
+const scoreHex = (score: number): string => {
   if (score >= 80) return '#10b981'
   if (score >= 50) return '#f59e0b'
   return '#ef4444'
 }
 
-export default function ScanResultModal() {
+const ScanResultModal = () => {
   const { styles } = useStyles()
   const { scanResult } = useRepositoryState()
   const { clearScanResult } = useRepositoryActions()
@@ -234,7 +234,9 @@ export default function ScanResultModal() {
   )
 }
 
-function ScanResultBody({
+export default ScanResultModal
+
+const ScanResultBody = ({
   scanResult, overall, scoreBadgeClass, scoreNumClass, ruleColumns, recItems,
 }: {
   scanResult: IScanResult
@@ -243,7 +245,7 @@ function ScanResultBody({
   scoreNumClass: string
   ruleColumns: object[]
   recItems: object[]
-}) {
+}) => {
   const { styles } = useStyles()
 
   return (
@@ -301,7 +303,7 @@ function ScanResultBody({
   )
 }
 
-function RecommendationBody({ rec }: { rec: IRecommendation }) {
+const RecommendationBody = ({ rec }: { rec: IRecommendation }) => {
   const { styles } = useStyles()
   return (
     <div className={styles.recommendationCard}>

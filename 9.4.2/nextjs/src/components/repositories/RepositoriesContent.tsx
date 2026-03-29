@@ -11,7 +11,7 @@ import ScanResultModal from './ScanResultModal'
 
 const { Title } = Typography
 
-function RepositoriesInner() {
+const RepositoriesInner = () => {
   const { styles } = useStyles()
   const [addOpen, setAddOpen] = useState(false)
   const { getRepositories } = useRepositoryActions()
@@ -50,10 +50,12 @@ function RepositoriesInner() {
   )
 }
 
-export default function RepositoriesContent() {
+const RepositoriesContent = () => {
   return (
     <RepositoryProvider>
       <RepositoriesInner />
     </RepositoryProvider>
   )
 }
+
+export default RepositoriesContent

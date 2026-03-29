@@ -97,7 +97,7 @@ const useStyles = createStyles(({ css }) => ({
   `,
 }));
 
-function FooterShieldIcon() {
+const FooterShieldIcon = () => {
   return (
     <svg
       width="28"
@@ -127,7 +127,7 @@ function FooterShieldIcon() {
   );
 }
 
-export default function LandingFooter() {
+const LandingFooter = () => {
   const { styles } = useStyles();
 
   return (
@@ -169,3 +169,5 @@ export default function LandingFooter() {
     </footer>
   );
 }
+
+export default LandingFooter

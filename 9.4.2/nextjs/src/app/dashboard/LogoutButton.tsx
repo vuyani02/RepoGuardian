@@ -4,11 +4,11 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from 'antd'
 
-export default function LogoutButton() {
+const LogoutButton = () => {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  async function handleLogout() {
+  const handleLogout = async () => {
     setLoading(true)
     await fetch('/api/auth/logout', { method: 'POST' })
     router.push('/login')
@@ -20,3 +20,5 @@ export default function LogoutButton() {
     </Button>
   )
 }
+
+export default LogoutButton

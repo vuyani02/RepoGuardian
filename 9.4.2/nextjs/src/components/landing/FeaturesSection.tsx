@@ -127,7 +127,7 @@ const features = [
   },
 ];
 
-export default function FeaturesSection() {
+const FeaturesSection = () => {
   const { styles } = useStyles();
 
   return (
@@ -166,3 +166,5 @@ export default function FeaturesSection() {
     </section>
   );
 }
+
+export default FeaturesSection

@@ -34,7 +34,7 @@ const useStyles = createStyles(({ css }) => ({
   `,
 }))
 
-export default function RepositoryTable() {
+const RepositoryTable = () => {
   const { styles } = useStyles()
   const { repositories, isPending, isScanPending, scanningRepositoryId } = useRepositoryState()
   const { startScan } = useRepositoryActions()
@@ -89,3 +89,5 @@ export default function RepositoryTable() {
     />
   )
 }
+
+export default RepositoryTable

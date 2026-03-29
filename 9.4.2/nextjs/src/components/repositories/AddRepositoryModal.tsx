@@ -19,7 +19,7 @@ interface Props {
   onClose: () => void
 }
 
-export default function AddRepositoryModal({ open, onClose }: Props) {
+const AddRepositoryModal = ({ open, onClose }: Props) => {
   const { styles } = useStyles()
   const [form] = Form.useForm()
   const { addRepository } = useRepositoryActions()
@@ -63,3 +63,5 @@ export default function AddRepositoryModal({ open, onClose }: Props) {
     </Modal>
   )
 }
+
+export default AddRepositoryModal

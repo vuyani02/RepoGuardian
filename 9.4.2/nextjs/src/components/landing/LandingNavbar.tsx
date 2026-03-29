@@ -46,7 +46,7 @@ const useStyles = createStyles(({ css }) => ({
   `,
 }));
 
-function ShieldIcon() {
+const ShieldIcon = () => {
   return (
     <svg
       width="32"
@@ -78,7 +78,7 @@ function ShieldIcon() {
   );
 }
 
-export default function LandingNavbar() {
+const LandingNavbar = () => {
   const { styles } = useStyles();
 
   return (
@@ -109,3 +109,5 @@ export default function LandingNavbar() {
     </nav>
   );
 }
+
+export default LandingNavbar

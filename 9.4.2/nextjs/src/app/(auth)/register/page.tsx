@@ -14,7 +14,7 @@ type RegisterValues = {
   password: string
 }
 
-function ShieldIcon() {
+const ShieldIcon = () => {
   return (
     <svg width="30" height="30" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -29,13 +29,13 @@ function ShieldIcon() {
   )
 }
 
-export default function RegisterPage() {
+const RegisterPage = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const { styles } = useStyles()
 
-  async function onFinish(values: RegisterValues) {
+  const onFinish = async (values: RegisterValues) => {
     setLoading(true)
     setError(null)
     try {
@@ -189,3 +189,5 @@ export default function RegisterPage() {
     </div>
   )
 }
+
+export default RegisterPage

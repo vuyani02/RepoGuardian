@@ -76,7 +76,7 @@ const useStyles = createStyles(({ css }) => ({
   `,
 }))
 
-function ShieldIcon() {
+const ShieldIcon = () => {
   return (
     <svg width="26" height="26" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -97,7 +97,7 @@ const navLinks = [
   { href: '/scans', label: 'Scans' },
 ]
 
-export default function AppNavbar() {
+const AppNavbar = () => {
   const { styles } = useStyles()
   const pathname = usePathname()
   const router = useRouter()
@@ -142,3 +142,5 @@ export default function AppNavbar() {
     </nav>
   )
 }
+
+export default AppNavbar
