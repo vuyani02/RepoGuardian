@@ -6,7 +6,7 @@ export const abpApi = axios.create({
   baseURL: process.env.API_URL,
   headers: {
     'Content-Type': 'application/json',
-    'Abp-TenantId': String(DEFAULT_TENANT_ID),
+    'Abp.TenantId': String(DEFAULT_TENANT_ID),
   },
 })
 
@@ -15,7 +15,7 @@ export const abpApiWithToken = (token: string) =>
     baseURL: process.env.API_URL,
     headers: {
       'Content-Type': 'application/json',
-      'Abp-TenantId': String(DEFAULT_TENANT_ID),
+      'Abp.TenantId': String(DEFAULT_TENANT_ID),
       Authorization: `Bearer ${token}`,
     },
   })
