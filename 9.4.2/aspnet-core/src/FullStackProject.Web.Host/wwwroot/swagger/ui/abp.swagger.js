@@ -84,7 +84,11 @@ var abp = abp || {};
                     var responseJSON = JSON.parse(xhrTenancyName.responseText);
                     var result = responseJSON.result;
                     if (result.state === 1) { // Tenant exists and active.
-                        loginUserInternal(result.tenantId, callback); // Login for tenant    
+                        // Set Abp.TenantId cookie so all subsequent Swagger requests carry the tenant context.
+                        // Without this, ABP has no tenant on requests after login because the requestInterceptor
+                        // only adds the auth token header — not the tenant header.
+                        abp.utils.setCookieValue('Abp.TenantId', result.tenantId.toString(), null, '/');
+                        loginUserInternal(result.tenantId, callback); // Login for tenant
                     } else {
                         alert('There is no such tenant or tenant is not active !');
                     }
