@@ -22,5 +22,8 @@ namespace FullStackProject.RepoGuardian
 
         /// <summary>Returns a summary of all scan runs for the current tenant, sorted latest first.</summary>
         Task<List<ScanSummaryDto>> GetAllScansAsync();
+
+        /// <summary>Returns aggregated dashboard statistics for the current tenant.</summary>
+        Task<DashboardStatsDto> GetDashboardStatsAsync();
     }
 }
