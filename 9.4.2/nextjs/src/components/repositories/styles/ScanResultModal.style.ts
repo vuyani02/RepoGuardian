@@ -86,6 +86,15 @@ export const useStyles = createStyles(({ css }) => ({
   progressLabelGreen: css`font-size: 12px; font-weight: 700; color: #10b981;`,
   progressLabelAmber: css`font-size: 12px; font-weight: 700; color: #f59e0b;`,
   progressLabelRed:   css`font-size: 12px; font-weight: 700; color: #ef4444;`,
+  rulesTableWrap: css`
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    @media (max-width: 768px) {
+      margin: 0 -16px;
+      padding: 0 16px;
+    }
+  `,
   rulesTable: css`margin-bottom: 24px;`,
   ruleName: css`
     font-weight: 600;

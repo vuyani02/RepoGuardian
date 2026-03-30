@@ -1,15 +1,15 @@
 'use client'
 
 import { Badge, Collapse, Modal, Progress, Table, Tag, Typography } from 'antd'
-import { IRecommendation, IRuleResult, IScanResult } from '@/lib/definitions'
+import { IRecommendation, IRuleResult, IScanResult, ScanResultModalProps } from '@/Types/Scan/Types'
 import { useStyles } from './styles/ScanResultModal.style'
 
 const { Title, Text, Paragraph } = Typography
 
-interface ScanResultModalProps {
-  scanResult: IScanResult
-  onClose: () => void
-}
+
+const ProgressLabel = ({ value, className }: { value?: number; className: string }) => (
+  <span className={className}>{value}</span>
+)
 
 const scoreVariant = (score: number): 'green' | 'amber' | 'red' => {
   if (score >= 80) return 'green'
@@ -29,8 +29,11 @@ const ScanResultModal = ({ scanResult, onClose }: ScanResultModalProps) => {
   const overall = scanResult.overallScore ?? 0
   const variant = scoreVariant(overall)
 
-  const scoreBadgeClass = `${styles.overallScore} ${styles[`score${variant.charAt(0).toUpperCase() + variant.slice(1)}` as keyof typeof styles]}`
-  const scoreNumClass = `${styles.scoreNumber} ${styles[`scoreNumber${variant.charAt(0).toUpperCase() + variant.slice(1)}` as keyof typeof styles]}`
+  const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+  const scoreBadgeKey = ('score' + cap(variant)) as keyof typeof styles
+  const scoreNumKey   = ('scoreNumber' + cap(variant)) as keyof typeof styles
+  const scoreBadgeClass = `${styles.overallScore} ${styles[scoreBadgeKey]}`
+  const scoreNumClass   = `${styles.scoreNumber} ${styles[scoreNumKey]}`
 
   const ruleColumns = [
     {
@@ -139,7 +142,7 @@ const ScanResultBody = ({
                 strokeColor={scoreHex(cs.score)}
                 trailColor="#e5e7eb"
                 size="small"
-                format={(p) => <span className={labelClass as string}>{p}</span>}
+                format={(p) => <ProgressLabel value={p} className={labelClass} />}
               />
             </div>
           )
@@ -147,14 +150,17 @@ const ScanResultBody = ({
       </div>
 
       <Title className={styles.sectionTitle}>Rule Results</Title>
-      <Table
-        dataSource={scanResult.ruleResults}
-        columns={ruleColumns as Parameters<typeof Table>[0]['columns']}
-        rowKey="ruleId"
-        pagination={false}
-        size="small"
-        className={styles.rulesTable}
-      />
+      <div className={styles.rulesTableWrap}>
+        <Table
+          dataSource={scanResult.ruleResults}
+          columns={ruleColumns as Parameters<typeof Table>[0]['columns']}
+          rowKey="ruleId"
+          pagination={false}
+          size="small"
+          scroll={{ x: 'max-content' }}
+          className={styles.rulesTable}
+        />
+      </div>
 
       {recItems.length > 0 && (
         <>
