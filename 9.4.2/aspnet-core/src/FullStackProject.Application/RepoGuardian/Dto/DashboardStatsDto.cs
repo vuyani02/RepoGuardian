@@ -28,5 +28,11 @@ namespace FullStackProject.RepoGuardian.Dto
 
         /// <summary>The rule that failed most often across the filtered scans, or null if no failures exist.</summary>
         public MostFailingRuleDto MostFailingRule { get; set; }
+
+        /// <summary>
+        /// Daily average compliance scores for the trend chart.
+        /// Each entry represents one calendar day; only days where at least one repo has a known score are included.
+        /// </summary>
+        public List<DailyAverageDto> TrendData { get; set; } = new();
     }
 }
