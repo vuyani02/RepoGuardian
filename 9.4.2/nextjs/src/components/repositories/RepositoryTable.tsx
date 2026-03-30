@@ -1,8 +1,9 @@
 'use client'
 
 import { Button, Table, Typography } from 'antd'
+import { RadarChartOutlined } from '@ant-design/icons'
 import { useRepositoryActions, useRepositoryState } from '@/providers/repositories'
-import { IRepository } from '@/lib/definitions'
+import { IRepository } from '@/Types/Repository/Types'
 import { useStyles } from './styles/RepositoryTable.style'
 
 const { Link } = Typography
@@ -42,7 +43,7 @@ const RepositoryTable = () => {
         <Button
           type="primary"
           size="small"
-          loading={isScanPending && scanningRepositoryId === row.id}
+          icon={<RadarChartOutlined spin={isScanPending && scanningRepositoryId === row.id} />}
           disabled={isScanPending && scanningRepositoryId !== row.id}
           onClick={() => startScan(row.id)}
           className={styles.scanBtn}

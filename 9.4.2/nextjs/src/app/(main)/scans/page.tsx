@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { Button, Typography } from 'antd'
+import { RadarChartOutlined } from '@ant-design/icons'
 import axios from 'axios'
-import { IScanResult } from '@/lib/definitions'
+import { IScanResult } from '@/Types/Scan/Types'
 import { useScansActions } from '@/providers/scans'
 import ScanHistoryTable from '@/components/scans/ScanHistoryTable'
 import StartScanModal from '@/components/scans/StartScanModal'
@@ -18,6 +19,7 @@ const ScansPage = () => {
 
   const [startScanOpen, setStartScanOpen] = useState(false)
   const [viewedResult, setViewedResult] = useState<IScanResult | null>(null)
+  const [isScanning, setIsScanning] = useState(false)
 
   useEffect(() => {
     getAllScans()
@@ -47,7 +49,7 @@ const ScansPage = () => {
           className={styles.scanBtn}
           onClick={() => setStartScanOpen(true)}
         >
-          + Scan
+          <RadarChartOutlined spin={isScanning} /> Scan
         </Button>
       </div>
 
@@ -59,6 +61,8 @@ const ScansPage = () => {
         open={startScanOpen}
         onClose={() => setStartScanOpen(false)}
         onScanComplete={handleScanComplete}
+        onScanStart={() => setIsScanning(true)}
+        onScanEnd={() => setIsScanning(false)}
       />
 
       {viewedResult && (

@@ -1,21 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import { Divider, Input, Modal, Select, Typography } from 'antd'
+import { Button, Divider, Input, Modal, Select, Typography } from 'antd'
+import { RadarChartOutlined } from '@ant-design/icons'
 import axios from 'axios'
-import { IScanResult } from '@/lib/definitions'
+import { StartScanModalProps } from '@/Types/Scan/Types'
 import { useRepositoryActions, useRepositoryState } from '@/providers/repositories'
 import { useStyles } from './styles/StartScanModal.style'
 
 const { Text } = Typography
 
-interface StartScanModalProps {
-  open: boolean
-  onClose: () => void
-  onScanComplete: (result: IScanResult) => void
-}
 
-const StartScanModal = ({ open, onClose, onScanComplete }: StartScanModalProps) => {
+const StartScanModal = ({ open, onClose, onScanComplete, onScanStart, onScanEnd }: StartScanModalProps) => {
   const { styles } = useStyles()
   const { repositories } = useRepositoryState()
   const { getRepositories } = useRepositoryActions()
@@ -39,6 +35,7 @@ const StartScanModal = ({ open, onClose, onScanComplete }: StartScanModalProps) 
   const handleScan = async () => {
     setError(null)
     setIsScanning(true)
+    onScanStart?.()
 
     try {
       let repositoryId = selectedRepoId
@@ -60,6 +57,7 @@ const StartScanModal = ({ open, onClose, onScanComplete }: StartScanModalProps) 
       setError('Scan failed. Please check the URL and try again.')
     } finally {
       setIsScanning(false)
+      onScanEnd?.()
     }
   }
 
@@ -68,19 +66,33 @@ const StartScanModal = ({ open, onClose, onScanComplete }: StartScanModalProps) 
     value: r.id,
   }))
 
+  const footer = [
+    <Button key="cancel" onClick={handleClose} disabled={isScanning}>
+      Cancel
+    </Button>,
+    <Button
+      key="scan"
+      type="primary"
+      icon={<RadarChartOutlined spin={isScanning} />}
+      loading={false}
+      disabled={isScanning}
+      onClick={handleScan}
+    >
+      Scan
+    </Button>,
+  ]
+
   return (
     <Modal
       open={open}
       onCancel={handleClose}
-      onOk={handleScan}
-      okText="Scan"
-      confirmLoading={isScanning}
       title="Start a Scan"
+      footer={footer}
       afterOpenChange={(visible) => { if (visible) handleOpen() }}
-      okButtonProps={{ disabled: isScanning }}
     >
-      <label className={styles.label}>Select an existing repository</label>
+      <label htmlFor="scan-repo-select" className={styles.label}>Select an existing repository</label>
       <Select
+        id="scan-repo-select"
         placeholder="Choose a repository…"
         options={repoOptions}
         value={selectedRepoId}
@@ -92,8 +104,9 @@ const StartScanModal = ({ open, onClose, onScanComplete }: StartScanModalProps) 
 
       <Divider className={styles.divider}>or</Divider>
 
-      <label className={styles.label}>Enter a new GitHub URL</label>
+      <label htmlFor="scan-github-url" className={styles.label}>Enter a new GitHub URL</label>
       <Input
+        id="scan-github-url"
         placeholder="https://github.com/owner/repo"
         value={newUrl}
         onChange={(e) => { setNewUrl(e.target.value); setSelectedRepoId(undefined) }}
