@@ -30,6 +30,17 @@ export interface IRecommendation {
   suggestedFix: string
 }
 
+export interface IScanSummary {
+  scanRunId: string
+  repositoryId: string
+  repositoryName: string
+  owner: string
+  status: string
+  overallScore: number | null
+  triggeredAt: string
+  completedAt: string | null
+}
+
 export interface IScanResult {
   scanRunId: string
   status: string
