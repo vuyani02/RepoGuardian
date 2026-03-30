@@ -27,6 +27,7 @@ namespace FullStackProject.RepoGuardian
         private readonly IRepository<GithubRepository, Guid> _repositoryRepo;
         private readonly IRepository<ScanRun, Guid> _scanRunRepo;
         private readonly IRepository<ComplianceScore, Guid> _complianceScoreRepo;
+        private readonly IRepository<RuleResult, Guid> _ruleResultRepo;
 
         public RepoGuardianAppService(
             RepoGuardianManager repoGuardianManager,
@@ -35,7 +36,8 @@ namespace FullStackProject.RepoGuardian
             AiExplanationService aiExplanationService,
             IRepository<GithubRepository, Guid> repositoryRepo,
             IRepository<ScanRun, Guid> scanRunRepo,
-            IRepository<ComplianceScore, Guid> complianceScoreRepo)
+            IRepository<ComplianceScore, Guid> complianceScoreRepo,
+            IRepository<RuleResult, Guid> ruleResultRepo)
         {
             _repoGuardianManager = repoGuardianManager;
             _githubService = githubService;
@@ -44,6 +46,7 @@ namespace FullStackProject.RepoGuardian
             _repositoryRepo = repositoryRepo;
             _scanRunRepo = scanRunRepo;
             _complianceScoreRepo = complianceScoreRepo;
+            _ruleResultRepo = ruleResultRepo;
         }
 
         /// <summary>
@@ -150,11 +153,16 @@ namespace FullStackProject.RepoGuardian
             };
         }
 
+        // Repos scoring below this threshold are considered non-compliant.
+        private const int PassingScoreThreshold = 50;
+
         /// <summary>Returns aggregated stats for the dashboard, filtered by date range and scan scope.</summary>
         public async Task<DashboardStatsDto> GetDashboardStatsAsync(DashboardStatsRequest request)
         {
             var totalRepositories = await _repositoryRepo.CountAsync();
             var allScanRuns = await _scanRunRepo.GetAllListAsync();
+            var repositories = await _repositoryRepo.GetAllListAsync();
+            var repoMap = repositories.ToDictionary(r => r.Id);
 
             var filtered = ApplyDateFilter(allScanRuns, request.DaysBack);
             filtered = ApplyScopeFilter(filtered, request.LatestPerRepo);
@@ -166,6 +174,7 @@ namespace FullStackProject.RepoGuardian
 
             var filteredIds = filtered.Select(s => s.Id).ToHashSet();
             var categoryScores = await _complianceScoreRepo.GetAllListAsync(s => filteredIds.Contains(s.ScanRunId));
+            var failedRuleResults = await _ruleResultRepo.GetAllListAsync(r => filteredIds.Contains(r.ScanRunId) && !r.Passed);
 
             var categoryAverages = categoryScores
                 .GroupBy(s => s.Category)
@@ -184,8 +193,58 @@ namespace FullStackProject.RepoGuardian
                 AverageComplianceScore = completedScores.Count > 0
                     ? Math.Round(completedScores.Average(), 1)
                     : null,
-                CategoryAverages = categoryAverages
+                CategoryAverages = categoryAverages,
+                ReposBelowThreshold = ComputeReposBelowThreshold(allScanRuns),
+                MostRecentScan = ComputeMostRecentScan(allScanRuns, repoMap),
+                MostFailingRule = ComputeMostFailingRule(failedRuleResults)
             };
+        }
+
+        /// <summary>
+        /// Counts repos whose most recent completed scan scored below the passing threshold.
+        /// Uses all scans (not the date-filtered set) to reflect current repo health.
+        /// </summary>
+        private static int ComputeReposBelowThreshold(List<ScanRun> allScanRuns)
+        {
+            return allScanRuns
+                .Where(s => s.Status == ScanRunStatus.Completed && s.OverallScore.HasValue)
+                .GroupBy(s => s.RepositoryId)
+                .Count(g => (double)g.OrderByDescending(s => s.TriggeredAt).First().OverallScore.Value < PassingScoreThreshold);
+        }
+
+        /// <summary>Returns the most recently triggered scan across all scans, or null if none exist.</summary>
+        private static MostRecentScanDto ComputeMostRecentScan(
+            List<ScanRun> allScanRuns,
+            Dictionary<Guid, GithubRepository> repoMap)
+        {
+            var latest = allScanRuns.OrderByDescending(s => s.TriggeredAt).FirstOrDefault();
+            if (latest == null) return null;
+
+            repoMap.TryGetValue(latest.RepositoryId, out var repo);
+            return new MostRecentScanDto
+            {
+                RepositoryName = repo?.Name ?? "Unknown",
+                Owner = repo?.Owner ?? string.Empty,
+                TriggeredAt = latest.TriggeredAt,
+                OverallScore = latest.OverallScore.HasValue ? (double)latest.OverallScore.Value : null
+            };
+        }
+
+        /// <summary>Returns the rule that failed most often across the filtered scans, or null if no failures exist.</summary>
+        private static MostFailingRuleDto ComputeMostFailingRule(List<RuleResult> failedRuleResults)
+        {
+            if (failedRuleResults.Count == 0) return null;
+
+            return failedRuleResults
+                .GroupBy(r => new { r.RuleId, r.RuleName })
+                .Select(g => new MostFailingRuleDto
+                {
+                    RuleId = g.Key.RuleId,
+                    RuleName = g.Key.RuleName,
+                    FailCount = g.Count()
+                })
+                .OrderByDescending(r => r.FailCount)
+                .First();
         }
 
         private static List<ScanRun> ApplyDateFilter(List<ScanRun> scanRuns, int? daysBack)
