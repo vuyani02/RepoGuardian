@@ -5,6 +5,7 @@ import { Button, Select, Typography } from 'antd'
 import { RadarChartOutlined } from '@ant-design/icons'
 import { useDashboardState, useDashboardActions } from '@/providers/dashboard'
 import StatsCard from '@/components/dashboard/StatsCard'
+import CategoryBarChart from '@/components/dashboard/CategoryBarChart'
 import StartScanModal from '@/components/scans/StartScanModal'
 import ScanResultModal from '@/components/repositories/ScanResultModal'
 import { IScanResult } from '@/Types/Scan/Types'
@@ -104,6 +105,11 @@ const DashboardPage = () => {
           variant={scoreVariant(stats?.averageComplianceScore ?? null)}
         />
       </div>
+
+      <CategoryBarChart
+        categoryAverages={stats?.categoryAverages ?? []}
+        isPending={isPending}
+      />
 
       <StartScanModal
         open={scanOpen}
