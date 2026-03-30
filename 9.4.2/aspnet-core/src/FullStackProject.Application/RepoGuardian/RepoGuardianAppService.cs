@@ -147,13 +147,16 @@ namespace FullStackProject.RepoGuardian
             };
         }
 
-        /// <summary>Returns aggregated stats for the dashboard: repo count, scan count, average compliance score.</summary>
-        public async Task<DashboardStatsDto> GetDashboardStatsAsync()
+        /// <summary>Returns aggregated stats for the dashboard, filtered by date range and scan scope.</summary>
+        public async Task<DashboardStatsDto> GetDashboardStatsAsync(DashboardStatsRequest request)
         {
             var totalRepositories = await _repositoryRepo.CountAsync();
-            var scanRuns = await _scanRunRepo.GetAllListAsync();
+            var allScanRuns = await _scanRunRepo.GetAllListAsync();
 
-            var completedScores = scanRuns
+            var filtered = ApplyDateFilter(allScanRuns, request.DaysBack);
+            filtered = ApplyScopeFilter(filtered, request.LatestPerRepo);
+
+            var completedScores = filtered
                 .Where(s => s.Status == ScanRunStatus.Completed && s.OverallScore.HasValue)
                 .Select(s => (double)s.OverallScore.Value)
                 .ToList();
@@ -161,11 +164,30 @@ namespace FullStackProject.RepoGuardian
             return new DashboardStatsDto
             {
                 TotalRepositories = totalRepositories,
-                TotalScans = scanRuns.Count,
+                TotalScans = filtered.Count,
                 AverageComplianceScore = completedScores.Count > 0
                     ? Math.Round(completedScores.Average(), 1)
                     : null
             };
+        }
+
+        private static List<ScanRun> ApplyDateFilter(List<ScanRun> scanRuns, int? daysBack)
+        {
+            if (!daysBack.HasValue)
+                return scanRuns;
+
+            var cutoff = DateTime.UtcNow.AddDays(-daysBack.Value);
+            return [..scanRuns.Where(s => s.TriggeredAt >= cutoff)];
+        }
+
+        private static List<ScanRun> ApplyScopeFilter(List<ScanRun> scanRuns, bool latestPerRepo)
+        {
+            if (!latestPerRepo)
+                return scanRuns;
+
+            return [..scanRuns
+                .GroupBy(s => s.RepositoryId)
+                .Select(g => g.OrderByDescending(s => s.TriggeredAt).First())];
         }
 
         private async Task GenerateAndSaveRecommendationsAsync(
