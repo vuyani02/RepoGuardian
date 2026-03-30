@@ -4,6 +4,7 @@ import AppFooter from '@/components/app/AppFooter'
 import AppShell from '@/components/app/AppShell'
 import { RepositoryProvider } from '@/providers/repositories'
 import { ScansProvider } from '@/providers/scans'
+import { DashboardProvider } from '@/providers/dashboard'
 
 const AppLayout = async ({ children }: { children: React.ReactNode }) => {
   await verifySession()
@@ -12,7 +13,9 @@ const AppLayout = async ({ children }: { children: React.ReactNode }) => {
     <AppShell navbar={<AppNavbar />} footer={<AppFooter />}>
       <RepositoryProvider>
         <ScansProvider>
-          {children}
+          <DashboardProvider>
+            {children}
+          </DashboardProvider>
         </ScansProvider>
       </RepositoryProvider>
     </AppShell>
