@@ -1,5 +1,5 @@
 import { handleActions } from 'redux-actions'
-import { IRepository } from '@/lib/definitions'
+import { IRepository } from '@/Types/Repository/Types'
 import { INITIAL_STATE, IRepositoryStateContext } from './context'
 import { RepositoryActionEnums } from './actions'
 

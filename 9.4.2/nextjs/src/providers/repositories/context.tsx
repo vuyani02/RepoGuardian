@@ -1,5 +1,6 @@
 import { createContext } from 'react'
-import { IRepository, IScanResult } from '@/lib/definitions'
+import { IRepository } from '@/Types/Repository/Types'
+import { IScanResult } from '@/Types/Scan/Types'
 
 export interface IRepositoryStateContext {
   isPending: boolean

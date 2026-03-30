@@ -91,6 +91,27 @@ function handleClick() { ... }
 - When ever you do something tell me what you are trying to do, don't just do.
 - Splitting a page into `page.tsx` + a separate `XxxContent` component when there is no server-side logic in `page.tsx`. Only split when `page.tsx` contains actual `async`/`await` work (data fetching, `verifySession`, etc.). If there is no server-side logic, put everything directly in `page.tsx`.
 
+### Types
+
+All TypeScript interfaces and types live in `src/Types/<Page>/Types.ts`. Never put types in `lib/`, component files, or provider files.
+
+```
+src/
+  Types/
+    Auth/
+      Types.ts       → LoginSchema, RegisterSchema, LoginState, RegisterState
+    Repository/
+      Types.ts       → IRepository
+    Scan/
+      Types.ts       → IScanSummary, IScanResult, IComplianceScore, IRuleResult, IRecommendation
+```
+
+Import from the Types folder:
+```ts
+import { IRepository } from '@/Types/Repository/Types'
+import { IScanResult } from '@/Types/Scan/Types'
+```
+
 ### Providers
 
 All data fetching uses the provider pattern (except login/register). Providers live in `src/providers/<name>/` with exactly 4 files.

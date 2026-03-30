@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { IScanSummary } from '@/lib/definitions'
+import { IScanSummary } from '@/Types/Scan/Types'
 
 export interface IScansStateContext {
   isPending: boolean

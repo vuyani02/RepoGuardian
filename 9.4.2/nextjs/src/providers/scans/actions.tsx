@@ -1,5 +1,5 @@
 import { createAction } from 'redux-actions'
-import { IScanSummary } from '@/lib/definitions'
+import { IScanSummary } from '@/Types/Scan/Types'
 import { IScansStateContext } from './context'
 
 export enum ScansActionEnums {

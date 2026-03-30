@@ -1,5 +1,6 @@
 import { createAction } from 'redux-actions'
-import { IRepository, IScanResult } from '@/lib/definitions'
+import { IRepository } from '@/Types/Repository/Types'
+import { IScanResult } from '@/Types/Scan/Types'
 import { IRepositoryStateContext } from './context'
 
 export enum RepositoryActionEnums {

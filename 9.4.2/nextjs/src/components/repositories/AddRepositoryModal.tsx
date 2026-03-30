@@ -3,13 +3,9 @@
 import { Form, Input, Modal } from 'antd'
 import { useRepositoryActions, useRepositoryState } from '@/providers/repositories'
 import { useStyles } from './styles/AddRepositoryModal.style'
+import { AddRepositoryModalProps } from '@/Types/Repository/Types'
 
-interface Props {
-  open: boolean
-  onClose: () => void
-}
-
-const AddRepositoryModal = ({ open, onClose }: Props) => {
+const AddRepositoryModal = ({ open, onClose }: AddRepositoryModalProps) => {
   const { styles } = useStyles()
   const [form] = Form.useForm()
   const { addRepository } = useRepositoryActions()
