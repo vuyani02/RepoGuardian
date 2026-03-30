@@ -86,6 +86,13 @@ namespace FullStackProject.Web.Host.Startup
                 client.BaseAddress = new Uri(_appConfiguration["GitHub:ApiBaseUrl"]);
                 client.DefaultRequestHeaders.Add("User-Agent", "RepoGuardian");
                 client.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
+
+                // Optional PAT — raises rate limit from 60 to 5 000 req/hour and avoids
+                // 403s that GitHub returns for unauthenticated requests from cloud IPs.
+                // Set GitHub__Token in the host environment (e.g. Render env vars).
+                var token = _appConfiguration["GitHub:Token"];
+                if (!string.IsNullOrWhiteSpace(token))
+                    client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
             });
 
             // Gemini AI client (OpenAI-compatible endpoint)
