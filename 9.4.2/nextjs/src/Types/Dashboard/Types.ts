@@ -16,6 +16,11 @@ export interface IMostFailingRule {
   failCount: number
 }
 
+export interface IDailyAverage {
+  date: string
+  averageScore: number
+}
+
 export interface IDashboardStats {
   totalRepositories: number
   totalScans: number
@@ -24,6 +29,7 @@ export interface IDashboardStats {
   reposBelowThreshold: number
   mostRecentScan: IMostRecentScan | null
   mostFailingRule: IMostFailingRule | null
+  trendData: IDailyAverage[]
 }
 
 export interface IDashboardFilters {
