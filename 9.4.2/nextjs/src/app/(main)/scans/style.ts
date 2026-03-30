@@ -11,16 +11,39 @@ export const useStyles = createStyles(({ css }) => ({
     }
   `,
   header: css`
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
     margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  `,
+  headerText: css`
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   `,
   title: css`
     font-size: 24px !important;
     font-weight: 800 !important;
     color: #111827 !important;
-    margin-bottom: 4px !important;
+    margin-bottom: 0 !important;
   `,
   subtitle: css`
     font-size: 14px !important;
     color: #6b7280 !important;
+  `,
+  tableWrap: css`
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #f3f4f6;
+    overflow-x: auto;
+    overflow-y: clip;
+  `,
+  scanBtn: css`
+    background: #4f46e5 !important;
+    border-color: #4f46e5 !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
   `,
 }))
