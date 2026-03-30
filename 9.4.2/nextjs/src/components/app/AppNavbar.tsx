@@ -1,6 +1,8 @@
 'use client'
 
-import { Button } from 'antd'
+import { useState } from 'react'
+import { Button, Drawer } from 'antd'
+import { MenuOutlined, CloseOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import axios from 'axios'
@@ -31,6 +33,7 @@ const AppNavbar = () => {
   const { styles } = useStyles()
   const pathname = usePathname()
   const router = useRouter()
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   const handleLogout = async () => {
     await axios.post('/api/auth/logout')
@@ -47,6 +50,7 @@ const AppNavbar = () => {
         </span>
       </Link>
 
+      {/* Desktop nav */}
       <div className={styles.nav}>
         {navLinks.map((link) => (
           <Link
@@ -59,6 +63,7 @@ const AppNavbar = () => {
         ))}
       </div>
 
+      {/* Desktop right */}
       <div className={styles.right}>
         <Button
           type="text"
@@ -69,6 +74,54 @@ const AppNavbar = () => {
           Log out
         </Button>
       </div>
+
+      {/* Mobile hamburger */}
+      <Button
+        type="text"
+        className={styles.hamburger}
+        icon={<MenuOutlined />}
+        onClick={() => setDrawerOpen(true)}
+      />
+
+      {/* Mobile drawer */}
+      <Drawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        placement="right"
+        width={240}
+        closeIcon={<CloseOutlined />}
+        title={
+          <Link href="/dashboard" className={styles.logo} onClick={() => setDrawerOpen(false)}>
+            <ShieldIcon />
+            <span className={styles.logoText}>
+              <span className="repo">Repo</span>
+              <span className="guardian">Guardian</span>
+            </span>
+          </Link>
+        }
+        styles={{ body: { padding: '16px 0' } }}
+      >
+        <div className={styles.drawerNav}>
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`${styles.drawerLink} ${pathname === link.href ? 'active' : ''}`}
+              onClick={() => setDrawerOpen(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
+          <div className={styles.drawerDivider} />
+          <Button
+            type="text"
+            onClick={() => { setDrawerOpen(false); handleLogout() }}
+            className={styles.drawerLogout}
+          >
+            Log out
+          </Button>
+        </div>
+      </Drawer>
     </nav>
   )
 }
