@@ -147,6 +147,27 @@ namespace FullStackProject.RepoGuardian
             };
         }
 
+        /// <summary>Returns aggregated stats for the dashboard: repo count, scan count, average compliance score.</summary>
+        public async Task<DashboardStatsDto> GetDashboardStatsAsync()
+        {
+            var totalRepositories = await _repositoryRepo.CountAsync();
+            var scanRuns = await _scanRunRepo.GetAllListAsync();
+
+            var completedScores = scanRuns
+                .Where(s => s.Status == ScanRunStatus.Completed && s.OverallScore.HasValue)
+                .Select(s => (double)s.OverallScore.Value)
+                .ToList();
+
+            return new DashboardStatsDto
+            {
+                TotalRepositories = totalRepositories,
+                TotalScans = scanRuns.Count,
+                AverageComplianceScore = completedScores.Count > 0
+                    ? Math.Round(completedScores.Average(), 1)
+                    : null
+            };
+        }
+
         private async Task GenerateAndSaveRecommendationsAsync(
             List<RuleResult> ruleResults, string owner, string repo)
         {
