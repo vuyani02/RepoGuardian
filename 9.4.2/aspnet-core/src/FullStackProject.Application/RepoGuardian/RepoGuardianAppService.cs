@@ -335,6 +335,91 @@ namespace FullStackProject.RepoGuardian
                 .Select(g => g.OrderByDescending(s => s.TriggeredAt).First())];
         }
 
+        /// <summary>
+        /// Runs a full scan against any public GitHub URL without writing anything to the database.
+        /// Intended for external callers who want scan results without registering a repository.
+        /// </summary>
+        [Abp.Authorization.AbpAllowAnonymous]
+        public async Task<ScanResultDto> QuickScanAsync(QuickScanRequest request)
+        {
+            var (owner, name) = _repoGuardianManager.ParseGithubUrl(request.GithubUrl);
+            var filePaths = await _githubService.GetFileTreeAsync(owner, name);
+
+            // Use a transient ID — results are never persisted so this ID is meaningless
+            var transientId = Guid.NewGuid();
+            var ruleResults = _ruleEngine.Evaluate(transientId, filePaths);
+
+            var categoryScores = ComputeInMemoryScores(ruleResults);
+            var overallScore = categoryScores.Any()
+                ? (int)Math.Round(categoryScores.Average(s => s.Score))
+                : 0;
+
+            var recommendations = await GenerateRecommendationsInMemoryAsync(ruleResults, owner, name);
+
+            return new ScanResultDto
+            {
+                ScanRunId = transientId,
+                Status = ScanRunStatus.Completed.ToString(),
+                OverallScore = overallScore,
+                TriggeredAt = DateTime.UtcNow,
+                CompletedAt = DateTime.UtcNow,
+                CategoryScores = categoryScores.Select(s => new ComplianceScoreDto
+                {
+                    Category = s.Category.ToString(),
+                    Score = s.Score
+                }).ToList(),
+                RuleResults = ruleResults.Select(r => new RuleResultDto
+                {
+                    RuleId = r.RuleId,
+                    RuleName = r.RuleName,
+                    Category = r.Category.ToString(),
+                    Passed = r.Passed,
+                    Details = r.Details
+                }).ToList(),
+                Recommendations = recommendations
+            };
+        }
+
+        /// <summary>Calculates per-category scores from in-memory rule results without touching the database.</summary>
+        private static List<(RuleCategory Category, int Score)> ComputeInMemoryScores(List<RuleResult> results)
+        {
+            return Enum.GetValues(typeof(RuleCategory))
+                .Cast<RuleCategory>()
+                .Select(category =>
+                {
+                    var categoryResults = results.Where(r => r.Category == category).ToList();
+                    if (!categoryResults.Any()) return (Category: category, Score: -1);
+                    var score = (int)Math.Round((double)categoryResults.Count(r => r.Passed) / categoryResults.Count * 100);
+                    return (Category: category, Score: score);
+                })
+                .Where(s => s.Score >= 0)
+                .ToList();
+        }
+
+        /// <summary>Calls the AI service for each failed rule and returns DTOs — no DB writes.</summary>
+        private async Task<List<RecommendationDto>> GenerateRecommendationsInMemoryAsync(
+            List<RuleResult> ruleResults, string owner, string repo)
+        {
+            var recommendations = new List<RecommendationDto>();
+
+            foreach (var failedRule in ruleResults.Where(r => !r.Passed))
+            {
+                var rec = await _aiExplanationService.GetRecommendationAsync(failedRule, owner, repo);
+                if (rec == null) continue;
+
+                recommendations.Add(new RecommendationDto
+                {
+                    RuleResultId = failedRule.Id,
+                    RuleId = failedRule.RuleId,
+                    IssueDescription = rec.IssueDescription,
+                    Explanation = rec.Explanation,
+                    SuggestedFix = rec.SuggestedFix
+                });
+            }
+
+            return recommendations;
+        }
+
         private async Task GenerateAndSaveRecommendationsAsync(
             List<RuleResult> ruleResults, string owner, string repo)
         {
