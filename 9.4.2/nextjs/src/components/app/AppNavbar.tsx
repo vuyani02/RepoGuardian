@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { Button, Drawer } from 'antd'
+import { Avatar, Button, Drawer } from 'antd'
 import { MenuOutlined, CloseOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import axios from 'axios'
+import { useProfileState } from '@/providers/profile'
 import { useStyles } from './styles/AppNavbar.style'
 
 const ShieldIcon = () => {
@@ -34,6 +35,8 @@ const AppNavbar = () => {
   const pathname = usePathname()
   const router = useRouter()
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const { profile } = useProfileState()
+  const teamInitial = profile?.teamName?.charAt(0).toUpperCase() ?? '?'
 
   const handleLogout = async () => {
     await axios.post('/api/auth/logout')
@@ -65,6 +68,9 @@ const AppNavbar = () => {
 
       {/* Desktop right */}
       <div className={styles.right}>
+        <Link href="/profile" className={styles.avatarLink}>
+          <Avatar className={styles.avatar}>{teamInitial}</Avatar>
+        </Link>
         <Button
           type="text"
           size="small"
@@ -113,6 +119,14 @@ const AppNavbar = () => {
             </Link>
           ))}
           <div className={styles.drawerDivider} />
+          <Link
+            href="/profile"
+            className={styles.drawerProfile}
+            onClick={() => setDrawerOpen(false)}
+          >
+            <Avatar size="small" className={styles.drawerAvatar}>{teamInitial}</Avatar>
+            Profile
+          </Link>
           <Button
             type="text"
             onClick={() => { setDrawerOpen(false); handleLogout() }}
