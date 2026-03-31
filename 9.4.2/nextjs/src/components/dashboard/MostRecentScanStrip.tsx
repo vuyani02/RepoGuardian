@@ -31,7 +31,7 @@ const renderScore = (score: number | null) =>
 
 const MostRecentScanStrip = ({ mostRecentScan, isPending }: MostRecentScanStripProps) => {
   const { styles } = useStyles()
-  const [now, setNow] = useState(Date.now())
+  const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 60_000)
