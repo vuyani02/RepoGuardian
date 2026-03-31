@@ -120,7 +120,7 @@ const RepoTrendChart = ({ scans, isPending }: RepoTrendChartProps) => {
           <path d={linePath} className={styles.trendLine} />
 
           {points.map((p) => (
-            <circle key={p.scan.scanRunId} cx={p.x} cy={p.y} r={4} className={styles.dot} />
+            <circle key={p.scan.scanRunId} cx={p.x} cy={p.y} r={3} className={styles.dot} />
           ))}
         </svg>
       </div>
