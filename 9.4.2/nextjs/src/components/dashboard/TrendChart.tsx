@@ -51,14 +51,20 @@ const TrendChart = ({ trendData, isPending }: TrendChartProps) => {
 
   const points = trendData.map((d, i) => ({ x: toX(i, n), y: toY(d.averageScore), d }))
 
-  const polylinePoints = points.map((p) => `${p.x},${p.y}`).join(' ')
+  // Build a smooth cubic bezier path through all points
+  const smoothPath = (pts: { x: number; y: number }[]) => {
+    if (pts.length === 1) return `M ${pts[0].x},${pts[0].y}`
+    return pts.reduce((acc, pt, i) => {
+      if (i === 0) return `M ${pt.x},${pt.y}`
+      const prev = pts[i - 1]
+      const cpX = (prev.x + pt.x) / 2
+      return `${acc} C ${cpX},${prev.y} ${cpX},${pt.y} ${pt.x},${pt.y}`
+    }, '')
+  }
 
-  // Closed path for the area fill: line + back along bottom
-  const areaPoints = [
-    ...points.map((p) => `${p.x},${p.y}`),
-    `${points[n - 1].x},${PAD.top + PLOT_H}`,
-    `${points[0].x},${PAD.top + PLOT_H}`,
-  ].join(' ')
+  const linePath = smoothPath(points)
+  // Closed area path: same smooth curve + drop down to baseline and back
+  const areaPath = `${linePath} L ${points[n - 1].x},${PAD.top + PLOT_H} L ${points[0].x},${PAD.top + PLOT_H} Z`
 
   // X-axis: show up to MAX_X_LABELS evenly spaced date labels
   const step = Math.ceil(n / MAX_X_LABELS)
@@ -118,10 +124,10 @@ const TrendChart = ({ trendData, isPending }: TrendChartProps) => {
           ))}
 
           {/* Area fill */}
-          <polygon points={areaPoints} className={styles.trendArea} />
+          <path d={areaPath} className={styles.trendArea} />
 
           {/* Trend line */}
-          <polyline points={polylinePoints} className={styles.trendLine} />
+          <path d={linePath} className={styles.trendLine} />
 
           {/* Data dots — only when points are sparse enough to be readable */}
           {n <= 30 && points.map((p) => (
