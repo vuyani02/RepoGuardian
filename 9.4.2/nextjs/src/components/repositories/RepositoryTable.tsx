@@ -1,7 +1,9 @@
 'use client'
 
-import { Button, Table, Typography } from 'antd'
+import { useState } from 'react'
+import { Button, Input, Table, Typography } from 'antd'
 import { RadarChartOutlined } from '@ant-design/icons'
+import { useRouter } from 'next/navigation'
 import { useRepositoryActions, useRepositoryState } from '@/providers/repositories'
 import { IRepository } from '@/Types/Repository/Types'
 import { useStyles } from './styles/RepositoryTable.style'
@@ -10,8 +12,16 @@ const { Link } = Typography
 
 const RepositoryTable = () => {
   const { styles } = useStyles()
+  const router = useRouter()
   const { repositories, isPending, isScanPending, scanningRepositoryId } = useRepositoryState()
   const { startScan } = useRepositoryActions()
+
+  const [search, setSearch] = useState('')
+
+  const filtered = (repositories ?? []).filter((r) => {
+    const q = search.toLowerCase()
+    return r.name.toLowerCase().includes(q) || r.owner.toLowerCase().includes(q)
+  })
 
   const columns = [
     {
@@ -20,7 +30,12 @@ const RepositoryTable = () => {
       minWidth: 180,
       render: (_: unknown, row: IRepository) => (
         <div>
-          <div className={styles.repoName}>{row.name}</div>
+          <span
+            className={styles.repoLink}
+            onClick={() => router.push(`/repositories/${row.id}`)}
+          >
+            {row.name}
+          </span>
           <div className={styles.owner}>{row.owner}</div>
         </div>
       ),
@@ -55,14 +70,26 @@ const RepositoryTable = () => {
   ]
 
   return (
-    <Table
-      dataSource={repositories ?? []}
-      columns={columns}
-      rowKey="id"
-      loading={isPending}
-      pagination={false}
-      locale={{ emptyText: 'No repositories yet. Add one to get started.' }}
-    />
+    <>
+      <div className={styles.toolbar}>
+        <Input.Search
+          placeholder="Search by name or owner…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onSearch={(val) => setSearch(val)}
+          allowClear
+          className={styles.searchInput}
+        />
+      </div>
+      <Table
+        dataSource={filtered}
+        columns={columns}
+        rowKey="id"
+        loading={isPending}
+        pagination={{ defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['5', '10', '20', '50'] }}
+        locale={{ emptyText: search ? 'No repositories match your search.' : 'No repositories yet. Add one to get started.' }}
+      />
+    </>
   )
 }
 

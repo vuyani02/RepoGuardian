@@ -25,4 +25,28 @@ export const useStyles = createStyles(({ css }) => ({
     border-color: #4f46e5 !important;
     border-radius: 8px !important;
   `,
+  toolbar: css`
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+  `,
+  searchInput: css`
+    flex: 1;
+    min-width: 180px;
+  `,
+  repoLink: css`
+    font-weight: 600;
+    font-size: 14px;
+    color: #4f46e5 !important;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  `,
 }))
