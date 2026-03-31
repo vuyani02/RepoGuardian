@@ -9,8 +9,10 @@ export const useStyles = createStyles(({ css }) => ({
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 100;
 
     @media (max-width: 768px) {
