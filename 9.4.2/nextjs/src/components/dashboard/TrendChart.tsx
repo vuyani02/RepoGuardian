@@ -64,9 +64,10 @@ const TrendChart = ({ trendData, isPending }: TrendChartProps) => {
   const step = Math.ceil(n / MAX_X_LABELS)
   const xLabels = points.filter((_, i) => i % step === 0 || i === n - 1)
 
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
   const formatDate = (iso: string) => {
     const d = new Date(iso)
-    return `${d.getMonth() + 1}/${d.getDate()}`
+    return `${d.getDate()} ${MONTHS[d.getMonth()]}`
   }
 
   return (
