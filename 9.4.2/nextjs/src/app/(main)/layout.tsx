@@ -12,8 +12,8 @@ const AppLayout = async ({ children }: { children: React.ReactNode }) => {
   await verifySession()
 
   return (
-    <AppShell navbar={<AppNavbar />} footer={<AppFooter />}>
-      <ProfileProvider>
+    <ProfileProvider>
+      <AppShell navbar={<AppNavbar />} footer={<AppFooter />}>
         <RepositoryProvider>
           <ScansProvider>
             <DashboardProvider>
@@ -23,8 +23,8 @@ const AppLayout = async ({ children }: { children: React.ReactNode }) => {
             </DashboardProvider>
           </ScansProvider>
         </RepositoryProvider>
-      </ProfileProvider>
-    </AppShell>
+      </AppShell>
+    </ProfileProvider>
   )
 }
 
