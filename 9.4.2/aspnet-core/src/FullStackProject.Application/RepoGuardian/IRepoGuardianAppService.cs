@@ -28,5 +28,11 @@ namespace FullStackProject.RepoGuardian
 
         /// <summary>Returns metadata and full scan history for a single repository.</summary>
         Task<RepositoryDetailDto> GetRepositoryDetailAsync(Guid id);
+
+        /// <summary>
+        /// Runs a full scan against any public GitHub URL without touching the database.
+        /// No repository is registered and no scan run is persisted — results are returned directly.
+        /// </summary>
+        Task<ScanResultDto> QuickScanAsync(QuickScanRequest request);
     }
 }
