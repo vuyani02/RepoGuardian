@@ -42,7 +42,7 @@ export const useStyles = createStyles(({ css }) => ({
   repoLink: css`
     font-weight: 600;
     font-size: 14px;
-    color: #4f46e5 !important;
+    color: #111827 !important;
     cursor: pointer;
 
     &:hover {
