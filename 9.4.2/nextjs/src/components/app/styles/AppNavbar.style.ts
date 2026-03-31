@@ -66,6 +66,25 @@ export const useStyles = createStyles(({ css }) => ({
     align-items: center;
     gap: 12px;
   `,
+  avatarLink: css`
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    border-radius: 50%;
+    transition: opacity 0.15s;
+
+    &:hover { opacity: 0.8; }
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+  `,
+  avatar: css`
+    background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+    font-weight: 700 !important;
+    cursor: pointer;
+    flex-shrink: 0;
+  `,
   logoutBtn: css`
     color: #9ca3af !important;
     font-size: 14px !important;
@@ -113,6 +132,25 @@ export const useStyles = createStyles(({ css }) => ({
     height: 1px;
     background: #f3f4f6;
     margin: 12px 0;
+  `,
+  drawerProfile: css`
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #374151;
+    text-decoration: none;
+    transition: background 0.15s;
+
+    &:hover { background: #f9fafb; }
+  `,
+  drawerAvatar: css`
+    background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+    font-weight: 700 !important;
+    flex-shrink: 0;
   `,
   drawerLogout: css`
     padding: 12px 16px !important;
