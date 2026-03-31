@@ -25,9 +25,10 @@ const toY = (score: number) =>
 interface TrendChartProps {
   trendData: IDailyAverage[]
   isPending: boolean
+  period: string
 }
 
-const TrendChart = ({ trendData, isPending }: TrendChartProps) => {
+const TrendChart = ({ trendData, isPending, period }: TrendChartProps) => {
   const { styles } = useStyles()
 
   if (isPending) {
@@ -41,7 +42,7 @@ const TrendChart = ({ trendData, isPending }: TrendChartProps) => {
   if (trendData.length === 0) {
     return (
       <div className={styles.card}>
-        <Title className={styles.title}>Compliance Trend</Title>
+        <Title className={styles.title}>Compliance Trend · {period}</Title>
         <Text className={styles.empty}>No trend data available yet.</Text>
       </div>
     )

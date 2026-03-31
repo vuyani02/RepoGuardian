@@ -133,6 +133,7 @@ const DashboardPage = () => {
       <TrendChart
         trendData={stats?.trendData ?? []}
         isPending={isPending}
+        period={DAYS_OPTIONS.find((o) => o.value === filters.daysBack)?.label ?? 'All time'}
       />
 
       <StartScanModal
