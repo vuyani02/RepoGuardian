@@ -86,6 +86,27 @@ export const useStyles = createStyles(({ css }) => ({
   progressLabelGreen: css`font-size: 12px; font-weight: 700; color: #10b981;`,
   progressLabelAmber: css`font-size: 12px; font-weight: 700; color: #f59e0b;`,
   progressLabelRed:   css`font-size: 12px; font-weight: 700; color: #ef4444;`,
+  rulesToolbar: css`
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+    }
+  `,
+  rulesSearch: css`
+    flex: 1;
+    min-width: 140px;
+  `,
+  rulesFilter: css`
+    width: 150px;
+
+    @media (max-width: 600px) {
+      width: 100%;
+    }
+  `,
   rulesTableWrap: css`
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -120,28 +141,89 @@ export const useStyles = createStyles(({ css }) => ({
     font-size: 13px !important;
     color: #6b7280 !important;
   `,
+  recCollapse: css`
+    border: none !important;
+    background: transparent !important;
+
+    .ant-collapse-item {
+      border: 1px solid #e5e7eb !important;
+      border-radius: 10px !important;
+      margin-bottom: 8px !important;
+      overflow: hidden;
+    }
+
+    .ant-collapse-item:last-child {
+      border-radius: 10px !important;
+    }
+
+    .ant-collapse-header {
+      background: #fef2f2 !important;
+      border-left: 4px solid #ef4444 !important;
+      padding: 12px 16px !important;
+      align-items: center !important;
+    }
+
+    .ant-collapse-content {
+      border-top: 1px solid #e5e7eb !important;
+    }
+
+    .ant-collapse-content-box {
+      padding: 0 !important;
+    }
+  `,
   recCollapseLabel: css`
     font-weight: 600;
     font-size: 14px;
+    color: #111827;
   `,
-  recommendationCard: css`
-    background: #f9fafb;
-    border-radius: 10px;
-    padding: 16px;
-    margin-bottom: 8px;
+  recFailBadge: css`
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #ef4444;
+    margin-left: 8px;
   `,
-  recLabel: css`
-    font-size: 11px;
-    font-weight: 700;
-    color: #9ca3af;
+  recSection: css`
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #f3f4f6;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  `,
+  recIconWrap: css`
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  `,
+  recIconIssue: css`background: #fef2f2;`,
+  recIconExplanation: css`background: #eff6ff;`,
+  recIconFix: css`background: #f0fdf4;`,
+  recSectionContent: css`
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  `,
+  recSectionLabel: css`
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #9ca3af !important;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-top: 8px;
-    margin-bottom: 2px;
+    margin: 0 !important;
   `,
-  recText: css`
+  recSectionText: css`
     font-size: 13px !important;
     color: #374151 !important;
-    margin-bottom: 0 !important;
+    margin: 0 !important;
   `,
 }))
