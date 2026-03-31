@@ -36,8 +36,12 @@ export const useStyles = createStyles(({ css }) => ({
     }
   `,
   searchInput: css`
-    flex: 1;
-    min-width: 180px;
+    width: 50%;
+    min-width: 200px;
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
   `,
   repoLink: css`
     font-weight: 600;
