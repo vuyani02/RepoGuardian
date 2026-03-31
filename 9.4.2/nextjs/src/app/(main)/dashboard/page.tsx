@@ -8,6 +8,7 @@ import StatsCard from '@/components/dashboard/StatsCard'
 import CategoryBarChart from '@/components/dashboard/CategoryBarChart'
 import MostRecentScanStrip from '@/components/dashboard/MostRecentScanStrip'
 import MostFailingRuleCard from '@/components/dashboard/MostFailingRuleCard'
+import TrendChart from '@/components/dashboard/TrendChart'
 import StartScanModal from '@/components/scans/StartScanModal'
 import ScanResultModal from '@/components/repositories/ScanResultModal'
 import { IScanResult } from '@/Types/Scan/Types'
@@ -126,6 +127,11 @@ const DashboardPage = () => {
 
       <MostFailingRuleCard
         mostFailingRule={stats?.mostFailingRule ?? null}
+        isPending={isPending}
+      />
+
+      <TrendChart
+        trendData={stats?.trendData ?? []}
         isPending={isPending}
       />
 
