@@ -26,25 +26,25 @@ namespace FullStackProject.RepoGuardian.Rules
             return new List<RuleResult>
             {
                 // ── Documentation ────────────────────────────────────────────
-                Check(scanRunId, "DOC_001", "README exists", RuleCategory.Documentation,
+                Check(scanRunId, "DOC_001", "README", RuleCategory.Documentation,
                     paths.Any(p => p == "readme.md" || p == "readme.txt" || p == "readme"
                                    || p.EndsWith("/readme.md") || p.EndsWith("/readme.txt"))),
 
-                Check(scanRunId, "DOC_002", "LICENSE exists", RuleCategory.Documentation,
+                Check(scanRunId, "DOC_002", "LICENSE", RuleCategory.Documentation,
                     paths.Any(p => p == "license" || p == "license.md" || p == "license.txt"
                                    || p.EndsWith("/license") || p.EndsWith("/license.md") || p.EndsWith("/license.txt"))),
 
-                Check(scanRunId, "DOC_003", "CONTRIBUTING guide exists", RuleCategory.Documentation,
+                Check(scanRunId, "DOC_003", "CONTRIBUTING guide", RuleCategory.Documentation,
                     paths.Any(p => p.Contains("contributing"))),
 
                 // ── Testing ───────────────────────────────────────────────────
-                Check(scanRunId, "TEST_001", "Test files or test directory exists", RuleCategory.Testing,
+                Check(scanRunId, "TEST_001", "Test files or test directory", RuleCategory.Testing,
                     paths.Any(p => p.Contains("/test/") || p.Contains("/tests/") || p.Contains("/__tests__/")
                                    || p.Contains(".test.") || p.Contains(".spec.")
                                    || p.StartsWith("test/") || p.StartsWith("tests/"))),
 
                 // ── CI/CD ─────────────────────────────────────────────────────
-                Check(scanRunId, "CICD_001", "CI/CD pipeline configured", RuleCategory.CiCd,
+                Check(scanRunId, "CICD_001", "CI/CD pipeline configuration", RuleCategory.CiCd,
                     paths.Any(p => p.StartsWith(".github/workflows/")
                                    || p.Contains(".gitlab-ci")
                                    || p.Contains("jenkinsfile")
@@ -52,7 +52,7 @@ namespace FullStackProject.RepoGuardian.Rules
                                    || p.Contains("azure-pipelines")
                                    || p.Contains(".travis.yml"))),
 
-                Check(scanRunId, "CICD_002", "Linting or formatting configuration exists", RuleCategory.CiCd,
+                Check(scanRunId, "CICD_002", "Linting or formatting configuration", RuleCategory.CiCd,
                     paths.Any(p => p.Contains(".eslintrc") || p.Contains("eslint.config.")
                                    || p.Contains(".pylintrc") || p.Contains(".rubocop")
                                    || p.Contains(".editorconfig") || p.Contains("stylecop")
@@ -60,7 +60,7 @@ namespace FullStackProject.RepoGuardian.Rules
                                    || p.Contains(".stylelintrc"))),
 
                 // ── Dependencies ──────────────────────────────────────────────
-                Check(scanRunId, "DEP_001", "Dependency lock file exists", RuleCategory.Dependencies,
+                Check(scanRunId, "DEP_001", "Dependency lock file", RuleCategory.Dependencies,
                     paths.Any(p => p == "package-lock.json" || p.EndsWith("/package-lock.json")
                                    || p == "yarn.lock" || p.EndsWith("/yarn.lock")
                                    || p == "pipfile.lock" || p.EndsWith("/pipfile.lock")
@@ -70,13 +70,13 @@ namespace FullStackProject.RepoGuardian.Rules
                                    || p == "composer.lock" || p.EndsWith("/composer.lock"))),
 
                 // ── Security ──────────────────────────────────────────────────
-                Check(scanRunId, "SEC_001", ".gitignore exists", RuleCategory.Security,
+                Check(scanRunId, "SEC_001", ".gitignore", RuleCategory.Security,
                     paths.Any(p => p == ".gitignore" || p.EndsWith("/.gitignore"))),
 
                 Check(scanRunId, "SEC_002", "No .env files committed", RuleCategory.Security,
                     !paths.Any(p => p == ".env" || p.EndsWith("/.env") || p.Contains("/.env."))),
 
-                Check(scanRunId, "SEC_003", "Security policy or CODEOWNERS exists", RuleCategory.Security,
+                Check(scanRunId, "SEC_003", "Security policy or CODEOWNERS", RuleCategory.Security,
                     paths.Any(p => p.Contains("security.md") || p.Contains("codeowners"))),
             };
         }
