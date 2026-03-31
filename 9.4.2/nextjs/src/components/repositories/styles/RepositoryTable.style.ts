@@ -49,10 +49,12 @@ export const useStyles = createStyles(({ css }) => ({
     font-weight: 600;
     font-size: 14px;
     color: #111827 !important;
+  `,
+  clickableRow: css`
     cursor: pointer;
 
-    &:hover {
-      text-decoration: underline;
+    &:hover td {
+      background: #f9fafb !important;
     }
   `,
 }))
