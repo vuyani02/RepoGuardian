@@ -1,26 +1,42 @@
 'use client'
 
-import { Form, Input, Modal } from 'antd'
+import { useState } from 'react'
+import { Form, Input, Modal, Typography } from 'antd'
 import { useRepositoryActions, useRepositoryState } from '@/providers/repositories'
 import { useStyles } from './styles/AddRepositoryModal.style'
 import { AddRepositoryModalProps } from '@/Types/Repository/Types'
+
+const { Text } = Typography
 
 const AddRepositoryModal = ({ open, onClose }: AddRepositoryModalProps) => {
   const { styles } = useStyles()
   const [form] = Form.useForm()
   const { addRepository } = useRepositoryActions()
   const { isAddPending } = useRepositoryState()
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (values: { githubUrl: string }) => {
-    await addRepository(values.githubUrl)
-    form.resetFields()
+    setError(null)
+    try {
+      await addRepository(values.githubUrl)
+      form.resetFields()
+      onClose()
+    } catch (err: unknown) {
+      const message = (err as { response?: { data?: { error?: { message?: string } } } })
+        ?.response?.data?.error?.message
+      setError(message ?? 'Failed to add repository. Please try again.')
+    }
+  }
+
+  const handleCancel = () => {
+    setError(null)
     onClose()
   }
 
   return (
     <Modal
       open={open}
-      onCancel={onClose}
+      onCancel={handleCancel}
       onOk={() => form.submit()}
       okText="Add Repository"
       okButtonProps={{ loading: isAddPending, className: styles.okBtn }}
@@ -45,6 +61,7 @@ const AddRepositoryModal = ({ open, onClose }: AddRepositoryModalProps) => {
             className={styles.input}
           />
         </Form.Item>
+        {error && <Text type="danger">{error}</Text>}
       </Form>
     </Modal>
   )
