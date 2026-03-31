@@ -67,12 +67,13 @@ const StartScanModal = ({ open, onClose, onScanComplete, onScanStart, onScanEnd 
   }))
 
   const footer = [
-    <Button key="cancel" onClick={handleClose} disabled={isScanning}>
+    <Button key="cancel" className={styles.cancelBtn} onClick={handleClose} disabled={isScanning}>
       Cancel
     </Button>,
     <Button
       key="scan"
       type="primary"
+      className={styles.scanBtn}
       icon={<RadarChartOutlined spin={isScanning} />}
       loading={false}
       disabled={isScanning}

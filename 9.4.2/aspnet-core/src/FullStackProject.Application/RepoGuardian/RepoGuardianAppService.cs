@@ -26,6 +26,8 @@ namespace FullStackProject.RepoGuardian
         private readonly AiExplanationService _aiExplanationService;
         private readonly IRepository<GithubRepository, Guid> _repositoryRepo;
         private readonly IRepository<ScanRun, Guid> _scanRunRepo;
+        private readonly IRepository<ComplianceScore, Guid> _complianceScoreRepo;
+        private readonly IRepository<RuleResult, Guid> _ruleResultRepo;
 
         public RepoGuardianAppService(
             RepoGuardianManager repoGuardianManager,
@@ -33,7 +35,9 @@ namespace FullStackProject.RepoGuardian
             RuleEngine ruleEngine,
             AiExplanationService aiExplanationService,
             IRepository<GithubRepository, Guid> repositoryRepo,
-            IRepository<ScanRun, Guid> scanRunRepo)
+            IRepository<ScanRun, Guid> scanRunRepo,
+            IRepository<ComplianceScore, Guid> complianceScoreRepo,
+            IRepository<RuleResult, Guid> ruleResultRepo)
         {
             _repoGuardianManager = repoGuardianManager;
             _githubService = githubService;
@@ -41,6 +45,8 @@ namespace FullStackProject.RepoGuardian
             _aiExplanationService = aiExplanationService;
             _repositoryRepo = repositoryRepo;
             _scanRunRepo = scanRunRepo;
+            _complianceScoreRepo = complianceScoreRepo;
+            _ruleResultRepo = ruleResultRepo;
         }
 
         /// <summary>
@@ -145,6 +151,273 @@ namespace FullStackProject.RepoGuardian
                     SuggestedFix = r.SuggestedFix
                 }).ToList()
             };
+        }
+
+        // Repos scoring below this threshold are considered non-compliant.
+        private const int PassingScoreThreshold = 50;
+
+        /// <summary>Returns aggregated stats for the dashboard, filtered by date range and scan scope.</summary>
+        public async Task<DashboardStatsDto> GetDashboardStatsAsync(DashboardStatsRequest request)
+        {
+            var totalRepositories = await _repositoryRepo.CountAsync();
+            var allScanRuns = await _scanRunRepo.GetAllListAsync();
+            var repositories = await _repositoryRepo.GetAllListAsync();
+            var repoMap = repositories.ToDictionary(r => r.Id);
+
+            var dateFiltered = ApplyDateFilter(allScanRuns, request.DaysBack);
+            var filtered = ApplyScopeFilter(dateFiltered, request.LatestPerRepo);
+
+            var completedScores = filtered
+                .Where(s => s.Status == ScanRunStatus.Completed && s.OverallScore.HasValue)
+                .Select(s => (double)s.OverallScore.Value)
+                .ToList();
+
+            var filteredIds = filtered.Select(s => s.Id).ToHashSet();
+            var categoryScores = await _complianceScoreRepo.GetAllListAsync(s => filteredIds.Contains(s.ScanRunId));
+            var failedRuleResults = await _ruleResultRepo.GetAllListAsync(r => filteredIds.Contains(r.ScanRunId) && !r.Passed);
+
+            var categoryAverages = categoryScores
+                .GroupBy(s => s.Category)
+                .Select(g => new CategoryAverageDto
+                {
+                    Category = g.Key.ToString(),
+                    AverageScore = Math.Round(g.Average(s => (double)s.Score), 1)
+                })
+                .OrderBy(c => c.Category)
+                .ToList();
+
+            return new DashboardStatsDto
+            {
+                TotalRepositories = totalRepositories,
+                TotalScans = dateFiltered.Count,
+                AverageComplianceScore = completedScores.Count > 0
+                    ? Math.Round(completedScores.Average(), 1)
+                    : null,
+                CategoryAverages = categoryAverages,
+                ReposBelowThreshold = ComputeReposBelowThreshold(allScanRuns),
+                MostRecentScan = ComputeMostRecentScan(allScanRuns, repoMap),
+                MostFailingRule = ComputeMostFailingRule(failedRuleResults),
+                TrendData = ComputeTrendData(allScanRuns, request.DaysBack)
+            };
+        }
+
+        /// <summary>
+        /// Counts repos whose most recent completed scan scored below the passing threshold.
+        /// Uses all scans (not the date-filtered set) to reflect current repo health.
+        /// </summary>
+        private static int ComputeReposBelowThreshold(List<ScanRun> allScanRuns)
+        {
+            return allScanRuns
+                .Where(s => s.Status == ScanRunStatus.Completed && s.OverallScore.HasValue)
+                .GroupBy(s => s.RepositoryId)
+                .Count(g => (double)g.OrderByDescending(s => s.TriggeredAt).First().OverallScore.Value < PassingScoreThreshold);
+        }
+
+        /// <summary>Returns the most recently triggered scan across all scans, or null if none exist.</summary>
+        private static MostRecentScanDto ComputeMostRecentScan(
+            List<ScanRun> allScanRuns,
+            Dictionary<Guid, GithubRepository> repoMap)
+        {
+            var latest = allScanRuns.OrderByDescending(s => s.TriggeredAt).FirstOrDefault();
+            if (latest == null) return null;
+
+            repoMap.TryGetValue(latest.RepositoryId, out var repo);
+            return new MostRecentScanDto
+            {
+                RepositoryName = repo?.Name ?? "Unknown",
+                Owner = repo?.Owner ?? string.Empty,
+                TriggeredAt = latest.TriggeredAt,
+                OverallScore = latest.OverallScore.HasValue ? (double)latest.OverallScore.Value : null
+            };
+        }
+
+        /// <summary>Returns the rule that failed most often across the filtered scans, or null if no failures exist.</summary>
+        private static MostFailingRuleDto ComputeMostFailingRule(List<RuleResult> failedRuleResults)
+        {
+            if (failedRuleResults.Count == 0) return null;
+
+            return failedRuleResults
+                .GroupBy(r => new { r.RuleId, r.RuleName })
+                .Select(g => new MostFailingRuleDto
+                {
+                    RuleId = g.Key.RuleId,
+                    RuleName = g.Key.RuleName,
+                    FailCount = g.Count()
+                })
+                .OrderByDescending(r => r.FailCount)
+                .First();
+        }
+
+        // Cap "all time" trend to this many days so the chart stays readable.
+        private const int MaxTrendDays = 90;
+
+        /// <summary>
+        /// Builds a daily series of average compliance scores.
+        /// Each day's score is the average of each repo's most recently known completed scan up to that date.
+        /// Days before any repo has a scan are omitted.
+        /// </summary>
+        private static List<DailyAverageDto> ComputeTrendData(List<ScanRun> allScanRuns, int? daysBack)
+        {
+            var today = DateTime.UtcNow.Date;
+            var windowDays = daysBack ?? MaxTrendDays;
+            var startDate = today.AddDays(-(windowDays - 1));
+
+            var completed = allScanRuns
+                .Where(s => s.Status == ScanRunStatus.Completed && s.OverallScore.HasValue)
+                .ToList();
+
+            var trendData = new List<DailyAverageDto>();
+
+            for (var day = startDate; day <= today; day = day.AddDays(1))
+            {
+                // For each repo find its latest scan up to this day
+                var dayScores = completed
+                    .Where(s => s.TriggeredAt.Date <= day)
+                    .GroupBy(s => s.RepositoryId)
+                    .Select(g => (double)g.OrderByDescending(s => s.TriggeredAt).First().OverallScore.Value)
+                    .ToList();
+
+                // Skip days where no repo has been scanned yet
+                if (dayScores.Count == 0) continue;
+
+                trendData.Add(new DailyAverageDto
+                {
+                    Date = day.ToString("yyyy-MM-dd"),
+                    AverageScore = Math.Round(dayScores.Average(), 1)
+                });
+            }
+
+            return trendData;
+        }
+
+        /// <summary>Returns metadata and full scan history for a single repository.</summary>
+        public async Task<RepositoryDetailDto> GetRepositoryDetailAsync(Guid id)
+        {
+            var repository = await _repositoryRepo.GetAsync(id);
+            var scans = await _scanRunRepo.GetAllListAsync(s => s.RepositoryId == id);
+
+            return new RepositoryDetailDto
+            {
+                Repository = MapToRepositoryDto(repository),
+                Scans = scans
+                    .OrderByDescending(s => s.TriggeredAt)
+                    .Select(s => new ScanSummaryDto
+                    {
+                        ScanRunId = s.Id,
+                        RepositoryId = s.RepositoryId,
+                        RepositoryName = repository.Name,
+                        Owner = repository.Owner,
+                        Status = s.Status.ToString(),
+                        OverallScore = s.OverallScore,
+                        TriggeredAt = s.TriggeredAt,
+                        CompletedAt = s.CompletedAt
+                    })
+                    .ToList()
+            };
+        }
+
+        private static List<ScanRun> ApplyDateFilter(List<ScanRun> scanRuns, int? daysBack)
+        {
+            if (!daysBack.HasValue)
+                return scanRuns;
+
+            var cutoff = DateTime.UtcNow.AddDays(-daysBack.Value);
+            return [..scanRuns.Where(s => s.TriggeredAt >= cutoff)];
+        }
+
+        private static List<ScanRun> ApplyScopeFilter(List<ScanRun> scanRuns, bool latestPerRepo)
+        {
+            if (!latestPerRepo)
+                return scanRuns;
+
+            return [..scanRuns
+                .GroupBy(s => s.RepositoryId)
+                .Select(g => g.OrderByDescending(s => s.TriggeredAt).First())];
+        }
+
+        /// <summary>
+        /// Runs a full scan against any public GitHub URL without writing anything to the database.
+        /// Intended for external callers who want scan results without registering a repository.
+        /// </summary>
+        [Abp.Authorization.AbpAllowAnonymous]
+        public async Task<ScanResultDto> QuickScanAsync(QuickScanRequest request)
+        {
+            var (owner, name) = _repoGuardianManager.ParseGithubUrl(request.GithubUrl);
+            var filePaths = await _githubService.GetFileTreeAsync(owner, name);
+
+            // Use a transient ID — results are never persisted so this ID is meaningless
+            var transientId = Guid.NewGuid();
+            var ruleResults = _ruleEngine.Evaluate(transientId, filePaths);
+
+            var categoryScores = ComputeInMemoryScores(ruleResults);
+            var overallScore = categoryScores.Any()
+                ? (int)Math.Round(categoryScores.Average(s => s.Score))
+                : 0;
+
+            var recommendations = await GenerateRecommendationsInMemoryAsync(ruleResults, owner, name);
+
+            return new ScanResultDto
+            {
+                ScanRunId = transientId,
+                Status = ScanRunStatus.Completed.ToString(),
+                OverallScore = overallScore,
+                TriggeredAt = DateTime.UtcNow,
+                CompletedAt = DateTime.UtcNow,
+                CategoryScores = categoryScores.Select(s => new ComplianceScoreDto
+                {
+                    Category = s.Category.ToString(),
+                    Score = s.Score
+                }).ToList(),
+                RuleResults = ruleResults.Select(r => new RuleResultDto
+                {
+                    RuleId = r.RuleId,
+                    RuleName = r.RuleName,
+                    Category = r.Category.ToString(),
+                    Passed = r.Passed,
+                    Details = r.Details
+                }).ToList(),
+                Recommendations = recommendations
+            };
+        }
+
+        /// <summary>Calculates per-category scores from in-memory rule results without touching the database.</summary>
+        private static List<(RuleCategory Category, int Score)> ComputeInMemoryScores(List<RuleResult> results)
+        {
+            return Enum.GetValues(typeof(RuleCategory))
+                .Cast<RuleCategory>()
+                .Select(category =>
+                {
+                    var categoryResults = results.Where(r => r.Category == category).ToList();
+                    if (!categoryResults.Any()) return (Category: category, Score: -1);
+                    var score = (int)Math.Round((double)categoryResults.Count(r => r.Passed) / categoryResults.Count * 100);
+                    return (Category: category, Score: score);
+                })
+                .Where(s => s.Score >= 0)
+                .ToList();
+        }
+
+        /// <summary>Calls the AI service for each failed rule and returns DTOs — no DB writes.</summary>
+        private async Task<List<RecommendationDto>> GenerateRecommendationsInMemoryAsync(
+            List<RuleResult> ruleResults, string owner, string repo)
+        {
+            var recommendations = new List<RecommendationDto>();
+
+            foreach (var failedRule in ruleResults.Where(r => !r.Passed))
+            {
+                var rec = await _aiExplanationService.GetRecommendationAsync(failedRule, owner, repo);
+                if (rec == null) continue;
+
+                recommendations.Add(new RecommendationDto
+                {
+                    RuleResultId = failedRule.Id,
+                    RuleId = failedRule.RuleId,
+                    IssueDescription = rec.IssueDescription,
+                    Explanation = rec.Explanation,
+                    SuggestedFix = rec.SuggestedFix
+                });
+            }
+
+            return recommendations;
         }
 
         private async Task GenerateAndSaveRecommendationsAsync(

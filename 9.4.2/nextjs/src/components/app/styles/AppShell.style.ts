@@ -9,5 +9,6 @@ export const useStyles = createStyles(({ css }) => ({
   main: css`
     flex: 1;
     background: #f9fafb;
+    padding-top: 60px;
   `,
 }))
