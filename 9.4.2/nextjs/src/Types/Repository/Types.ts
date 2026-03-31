@@ -16,3 +16,11 @@ export interface AddRepositoryModalProps {
   open: boolean
   onClose: () => void
 }
+
+export interface RepoDetailHeaderProps {
+  repository: IRepository | undefined
+  lastScanScore: number | null
+  isPending: boolean
+  onScan: () => void
+  isScanning: boolean
+}
