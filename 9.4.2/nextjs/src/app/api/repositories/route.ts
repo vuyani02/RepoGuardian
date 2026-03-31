@@ -13,9 +13,15 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const { accessToken } = await verifySession()
   const body = await req.json()
-  const { data } = await abpApiWithToken(accessToken).post(
-    '/api/services/app/RepoGuardian/AddRepository',
-    { githubUrl: body.githubUrl }
-  )
-  return NextResponse.json(data.result)
+  try {
+    const { data } = await abpApiWithToken(accessToken).post(
+      '/api/services/app/RepoGuardian/AddRepository',
+      { githubUrl: body.githubUrl, allowExisting: body.allowExisting ?? false }
+    )
+    return NextResponse.json(data.result)
+  } catch (err: unknown) {
+    const axiosErr = err as { response?: { status?: number; data?: unknown } }
+    const status = axiosErr.response?.status ?? 500
+    return NextResponse.json(axiosErr.response?.data ?? {}, { status })
+  }
 }
