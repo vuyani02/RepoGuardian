@@ -6,8 +6,10 @@ using Microsoft.Extensions.Hosting;
 
 namespace FullStackProject.Web.Host.Startup
 {
+    /// <summary>Application entry point — bootstraps the ASP.NET Core host with Castle Windsor.</summary>
     public class Program
     {
+        /// <summary>Configures and starts the web host.</summary>
         public static void Main(string[] args)
         {
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
