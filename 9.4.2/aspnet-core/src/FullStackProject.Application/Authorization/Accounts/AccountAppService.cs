@@ -5,6 +5,7 @@ using Abp.Domain.Uow;
 using Abp.UI;
 using Abp.Zero.Configuration;
 using FullStackProject.Authorization.Accounts.Dto;
+using FullStackProject.Authorization.Roles;
 using FullStackProject.Authorization.Users;
 using FullStackProject.Domains.RepoGuardian;
 using FullStackProject.MultiTenancy;
@@ -81,6 +82,10 @@ namespace FullStackProject.Authorization.Accounts
                     input.Password,
                     true
                 );
+
+                // The person who creates a team becomes its first admin.
+                if (input.TeamAction == "create")
+                    CheckErrors(await UserManager.AddToRoleAsync(user, StaticRoleNames.Tenants.Admin));
 
                 var requireConfirmation = await SettingManager.GetSettingValueAsync<bool>(
                     AbpZeroSettingNames.UserManagement.IsEmailConfirmationRequiredForLogin);
