@@ -183,6 +183,26 @@ export const useStyles = createStyles(({ css }) => ({
     .ant-radio-button-wrapper:last-child {
       border-radius: 0 10px 10px 0 !important;
     }
+
+    .ant-radio-button-wrapper-checked {
+      background: #4f46e5 !important;
+      border-color: #4f46e5 !important;
+      color: #ffffff !important;
+    }
+
+    .ant-radio-button-wrapper-checked::before {
+      background: #4f46e5 !important;
+    }
+
+    .ant-radio-button-wrapper:hover {
+      color: #4f46e5 !important;
+    }
+
+    .ant-radio-button-wrapper-checked:hover {
+      background: #4338ca !important;
+      border-color: #4338ca !important;
+      color: #ffffff !important;
+    }
   `,
   submitItem: css`
     margin-bottom: 0;
