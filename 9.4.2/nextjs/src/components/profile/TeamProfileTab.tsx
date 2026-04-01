@@ -74,15 +74,17 @@ const TeamProfileTab = ({ teamName, teamMembers, isPending }: TeamProfileTabProp
         <Title level={5} className={styles.sectionTitle}>
           Members · {teamMembers.length}
         </Title>
-        <Table
-          dataSource={teamMembers}
-          columns={columns}
-          rowKey="id"
-          loading={isPending}
-          pagination={{ defaultPageSize: 4, showSizeChanger: true, pageSizeOptions: ['4', '10', '20'] }}
-          size="small"
-          scroll={{ x: 'max-content' }}
-        />
+        <div className={styles.tableWrap}>
+          <Table
+            dataSource={teamMembers}
+            columns={columns}
+            rowKey="id"
+            loading={isPending}
+            pagination={{ defaultPageSize: 4, showSizeChanger: true, pageSizeOptions: ['4', '10', '20'] }}
+            size="small"
+            scroll={{ x: 'max-content' }}
+          />
+        </div>
       </Card>
     </div>
   )
