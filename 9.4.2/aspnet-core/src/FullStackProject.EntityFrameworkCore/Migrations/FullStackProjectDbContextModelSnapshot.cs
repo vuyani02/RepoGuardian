@@ -1730,9 +1730,10 @@ namespace FullStackProject.Migrations
 
             modelBuilder.Entity("FullStackProject.Domains.RepoGuardian.RuleDefinition", b =>
                 {
-                    b.Property<string>("RuleId")
+                    b.Property<string>("Id")
                         .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("RuleId");
 
                     b.Property<int>("Category")
                         .HasColumnType("integer");
@@ -1757,7 +1758,7 @@ namespace FullStackProject.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
 
-                    b.HasKey("RuleId");
+                    b.HasKey("Id");
 
                     b.ToTable("RuleDefinitions");
                 });
