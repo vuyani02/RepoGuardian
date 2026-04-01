@@ -74,10 +74,43 @@ namespace FullStackProject.RepoGuardian.Rules
                     paths.Any(p => p == ".gitignore" || p.EndsWith("/.gitignore"))),
 
                 Check(scanRunId, "SEC_002", "No .env files committed", RuleCategory.Security,
-                    !paths.Any(p => p == ".env" || p.EndsWith("/.env") || p.Contains("/.env."))),
+                    !HasCommittedEnvFile(paths)),
 
                 Check(scanRunId, "SEC_003", "Security policy or CODEOWNERS", RuleCategory.Security,
                     paths.Any(p => p.Contains("security.md") || p.Contains("codeowners"))),
+
+                Check(scanRunId, "SEC_004", ".env.example documents environment variables", RuleCategory.Security,
+                    paths.Any(p => p == ".env.example" || p.EndsWith("/.env.example")
+                                   || p == ".env.sample" || p.EndsWith("/.env.sample")
+                                   || p == ".env.template" || p.EndsWith("/.env.template"))),
+
+                // ── Documentation (extended) ──────────────────────────────────
+                Check(scanRunId, "DOC_004", "Changelog", RuleCategory.Documentation,
+                    paths.Any(p => p.Contains("changelog"))),
+
+                Check(scanRunId, "DOC_005", "Code of conduct", RuleCategory.Documentation,
+                    paths.Any(p => p.Contains("code_of_conduct") || p.Contains("code-of-conduct"))),
+
+                // ── Testing (extended) ────────────────────────────────────────
+                Check(scanRunId, "TEST_002", "Test coverage configuration", RuleCategory.Testing,
+                    paths.Any(p => p.Contains("codecov.yml") || p.Contains(".coveragerc")
+                                   || p.Contains("jest.config.") || p.Contains("coverage.xml")
+                                   || p.Contains(".nycrc") || p.Contains("coverlet"))),
+
+                // ── CI/CD (extended) ──────────────────────────────────────────
+                Check(scanRunId, "CICD_003", "Containerisation (Docker)", RuleCategory.CiCd,
+                    paths.Any(p => p == "dockerfile" || p.EndsWith("/dockerfile")
+                                   || p.Contains("docker-compose"))),
+
+                Check(scanRunId, "CICD_004", "PR or issue templates", RuleCategory.CiCd,
+                    paths.Any(p => p.Contains(".github/pull_request_template")
+                                   || p.Contains(".github/issue_template")
+                                   || p.Contains(".github/issuetemplate"))),
+
+                // ── Dependencies (extended) ───────────────────────────────────
+                Check(scanRunId, "DEP_002", "Dependency update automation", RuleCategory.Dependencies,
+                    paths.Any(p => p.Contains(".github/dependabot.yml")
+                                   || p.Contains("renovate.json") || p.Contains(".renovaterc"))),
             };
         }
 
@@ -92,6 +125,28 @@ namespace FullStackProject.RepoGuardian.Rules
                 Passed = passed,
                 Details = passed ? $"{ruleName} detected." : $"{ruleName} not found."
             };
+        }
+
+        /// <summary>
+        /// Returns true if any committed file looks like a real .env file.
+        /// Explicitly ignores safe template variants (.env.example, .env.sample, .env.template)
+        /// so that repos that document their environment variables are not penalised.
+        /// </summary>
+        private static bool HasCommittedEnvFile(List<string> paths)
+        {
+            var safePatterns = new[] { ".env.example", ".env.sample", ".env.template" };
+
+            return paths.Any(p =>
+            {
+                // Must look like a .env file
+                var isEnvFile = p == ".env" || p.EndsWith("/.env") ||
+                                p.StartsWith(".env.") || p.Contains("/.env.");
+
+                if (!isEnvFile) return false;
+
+                // Exclude safe template variants regardless of directory depth
+                return !safePatterns.Any(safe => p == safe || p.EndsWith("/" + safe));
+            });
         }
     }
 }
