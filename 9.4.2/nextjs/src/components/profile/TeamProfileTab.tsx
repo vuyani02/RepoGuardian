@@ -79,7 +79,7 @@ const TeamProfileTab = ({ teamName, teamMembers, isPending }: TeamProfileTabProp
           columns={columns}
           rowKey="id"
           loading={isPending}
-          pagination={{ pageSize: 10, hideOnSinglePage: true }}
+          pagination={{ defaultPageSize: 4, showSizeChanger: true, pageSizeOptions: ['4', '10', '20'] }}
           size="small"
         />
       </Card>
