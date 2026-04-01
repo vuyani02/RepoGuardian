@@ -31,10 +31,6 @@ export const useStyles = createStyles(({ css }) => ({
     border-radius: 12px;
     border: 1px solid #e5e7eb;
   `,
-  tableWrap: css`
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  `,
   sectionTitle: css`
     font-size: 15px !important;
     font-weight: 600 !important;
