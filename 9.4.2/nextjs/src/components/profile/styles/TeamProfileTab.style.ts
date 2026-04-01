@@ -42,4 +42,34 @@ export const useStyles = createStyles(({ css }) => ({
     color: #4f46e5 !important;
     font-weight: 600 !important;
   `,
+  roleAdmin: css`
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 9999px;
+    background: #eef2ff;
+    color: #4f46e5;
+    font-size: 12px;
+    font-weight: 600;
+  `,
+  roleMember: css`
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 9999px;
+    background: #f3f4f6;
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 500;
+  `,
+  actions: css`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  `,
+  makeAdminBtn: css`
+    color: #4f46e5 !important;
+    border-color: #4f46e5 !important;
+    &:hover {
+      background: #eef2ff !important;
+    }
+  `,
 }))
