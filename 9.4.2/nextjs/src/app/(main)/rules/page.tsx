@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { Badge, Divider, Skeleton, Typography } from 'antd'
 import { useRulesState, useRulesActions } from '@/providers/rules'
-import { useProfileState } from '@/providers/profile'
+import { useProfileState, useProfileActions } from '@/providers/profile'
 import RulesAccordion from '@/components/rules/RulesAccordion'
 import { useStyles } from './style'
 
@@ -14,11 +14,13 @@ const RulesPage = () => {
   const { rules, isPending, isTogglePending } = useRulesState()
   const { getRules, toggleRule } = useRulesActions()
   const { profile } = useProfileState()
+  const { getProfile } = useProfileActions()
 
   const isAdmin = profile?.currentUserIsAdmin ?? false
 
   useEffect(() => {
     getRules()
+    if (!profile) getProfile()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
