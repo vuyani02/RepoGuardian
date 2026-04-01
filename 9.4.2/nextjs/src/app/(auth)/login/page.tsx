@@ -72,7 +72,7 @@ const LoginForm = () => {
 
         <div className={styles.features}>
           {[
-            '10 compliance rules across 5 categories',
+            '17 compliance rules across 5 categories',
             'AI-generated fix recommendations',
             'Instant scan results',
             'Team-wide repo visibility',

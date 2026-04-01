@@ -14,7 +14,7 @@ const steps = [
   {
     number: "2",
     title: "Trigger a Scan",
-    text: "Hit Scan and RepoGuardian evaluates your repo against all 10 rules across 5 compliance categories in seconds.",
+    text: "Hit Scan and RepoGuardian evaluates your repo against all 17 rules across 5 compliance categories in seconds.",
   },
   {
     number: "3",

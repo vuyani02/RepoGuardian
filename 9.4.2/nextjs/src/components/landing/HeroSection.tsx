@@ -49,7 +49,7 @@ const HeroSection = () => {
 
         <div className={styles.statsRow}>
           <div className={styles.stat}>
-            <div className={styles.statNumber}>10+</div>
+            <div className={styles.statNumber}>17+</div>
             <div className={styles.statLabel}>Compliance Rules</div>
           </div>
           <div className={styles.stat}>
