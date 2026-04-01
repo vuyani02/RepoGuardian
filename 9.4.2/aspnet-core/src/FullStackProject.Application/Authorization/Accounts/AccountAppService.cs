@@ -6,6 +6,7 @@ using Abp.UI;
 using Abp.Zero.Configuration;
 using FullStackProject.Authorization.Accounts.Dto;
 using FullStackProject.Authorization.Users;
+using FullStackProject.Domains.RepoGuardian;
 using FullStackProject.MultiTenancy;
 
 namespace FullStackProject.Authorization.Accounts
@@ -16,15 +17,18 @@ namespace FullStackProject.Authorization.Accounts
         private readonly UserRegistrationManager _userRegistrationManager;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
         private readonly IRepository<Tenant> _tenantRepository;
+        private readonly IActiveRuleRepository _activeRuleRepo;
 
         public AccountAppService(
             UserRegistrationManager userRegistrationManager,
             IUnitOfWorkManager unitOfWorkManager,
-            IRepository<Tenant> tenantRepository)
+            IRepository<Tenant> tenantRepository,
+            IActiveRuleRepository activeRuleRepo)
         {
             _userRegistrationManager = userRegistrationManager;
             _unitOfWorkManager = unitOfWorkManager;
             _tenantRepository = tenantRepository;
+            _activeRuleRepo = activeRuleRepo;
         }
 
         /// <summary>
@@ -58,6 +62,10 @@ namespace FullStackProject.Authorization.Accounts
         public async Task<RegisterOutput> Register(RegisterInput input)
         {
             var tenantId = await ResolveOrCreateTenantAsync(input.TeamAction, input.TeamName);
+
+            // Seed all compliance rules for brand-new tenants so they start with everything active.
+            if (input.TeamAction == "create")
+                await _activeRuleRepo.SeedAllRulesForTenantAsync(tenantId);
 
             // AbpSession.Use overrides the session claims for this scope, which is required
             // because UserRegistrationManager.CheckForTenant reads AbpSession.TenantId directly.
