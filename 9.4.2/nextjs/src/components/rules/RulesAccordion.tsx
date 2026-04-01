@@ -64,6 +64,7 @@ const RulesAccordion = ({ rules, activeOnly, isTogglePending, onToggle }: RulesA
                 <Switch
                   checked={rule.isActive}
                   size="small"
+                  className={styles.toggle}
                   onClick={(_, e) => {
                     e.stopPropagation()
                     onToggle(rule.ruleId, !rule.isActive)

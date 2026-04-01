@@ -88,6 +88,15 @@ export const useStyles = createStyles(({ css }) => ({
     line-height: 1.6;
     margin: 0;
   `,
+  toggle: css`
+    &.ant-switch-checked {
+      background: #4f46e5 !important;
+    }
+
+    &.ant-switch-checked:hover {
+      background: #4338ca !important;
+    }
+  `,
   empty: css`
     text-align: center;
     padding: 32px;
