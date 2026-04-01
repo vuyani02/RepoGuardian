@@ -32,6 +32,8 @@ const ProfilePage = () => {
         <TeamProfileTab
           teamName={profile?.teamName ?? ''}
           teamMembers={profile?.teamMembers ?? []}
+          currentUserIsAdmin={profile?.currentUserIsAdmin ?? false}
+          currentUserId={profile?.user?.id ?? 0}
           isPending={isPending}
         />
       ),

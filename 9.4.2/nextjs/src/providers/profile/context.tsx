@@ -10,6 +10,8 @@ export interface IProfileStateContext {
 
 export interface IProfileActionContext {
   getProfile: () => void
+  makeAdmin: (userId: number) => Promise<void>
+  deleteMember: (userId: number) => Promise<void>
 }
 
 export const INITIAL_STATE: IProfileStateContext = {

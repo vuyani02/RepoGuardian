@@ -16,14 +16,16 @@ namespace FullStackProject.RepoGuardian.Rules
         public ILogger Logger { get; set; } = NullLogger.Instance;
 
         /// <summary>
-        /// Runs all best-practice rules against the provided file paths and returns a result per rule.
+        /// Runs best-practice rules against the provided file paths and returns a result per rule.
+        /// When <paramref name="activeRuleIds"/> is provided only rules in that set are evaluated;
+        /// pass null to evaluate all rules (e.g. anonymous quick scans).
         /// </summary>
-        public List<RuleResult> Evaluate(Guid scanRunId, List<string> filePaths)
+        public List<RuleResult> Evaluate(Guid scanRunId, List<string> filePaths, IReadOnlyCollection<string> activeRuleIds = null)
         {
             Logger.Debug($"RuleEngine: evaluating {filePaths.Count} paths for scan {scanRunId}");
             var paths = filePaths.Select(p => p.ToLowerInvariant()).ToList();
 
-            return new List<RuleResult>
+            var allResults = new List<RuleResult>
             {
                 // ── Documentation ────────────────────────────────────────────
                 Check(scanRunId, "DOC_001", "README", RuleCategory.Documentation,
@@ -112,6 +114,11 @@ namespace FullStackProject.RepoGuardian.Rules
                     paths.Any(p => p.Contains(".github/dependabot.yml")
                                    || p.Contains("renovate.json") || p.Contains(".renovaterc"))),
             };
+
+            if (activeRuleIds == null)
+                return allResults;
+
+            return allResults.Where(r => activeRuleIds.Contains(r.RuleId)).ToList();
         }
 
         private static RuleResult Check(Guid scanRunId, string ruleId, string ruleName, RuleCategory category, bool passed)

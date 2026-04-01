@@ -5,7 +5,9 @@ using Abp.Domain.Uow;
 using Abp.UI;
 using Abp.Zero.Configuration;
 using FullStackProject.Authorization.Accounts.Dto;
+using FullStackProject.Authorization.Roles;
 using FullStackProject.Authorization.Users;
+using FullStackProject.Domains.RepoGuardian;
 using FullStackProject.MultiTenancy;
 
 namespace FullStackProject.Authorization.Accounts
@@ -16,15 +18,20 @@ namespace FullStackProject.Authorization.Accounts
         private readonly UserRegistrationManager _userRegistrationManager;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
         private readonly IRepository<Tenant> _tenantRepository;
+        private readonly IActiveRuleRepository _activeRuleRepo;
+
+        public RoleManager RoleManager { get; set; }
 
         public AccountAppService(
             UserRegistrationManager userRegistrationManager,
             IUnitOfWorkManager unitOfWorkManager,
-            IRepository<Tenant> tenantRepository)
+            IRepository<Tenant> tenantRepository,
+            IActiveRuleRepository activeRuleRepo)
         {
             _userRegistrationManager = userRegistrationManager;
             _unitOfWorkManager = unitOfWorkManager;
             _tenantRepository = tenantRepository;
+            _activeRuleRepo = activeRuleRepo;
         }
 
         /// <summary>
@@ -59,6 +66,10 @@ namespace FullStackProject.Authorization.Accounts
         {
             var tenantId = await ResolveOrCreateTenantAsync(input.TeamAction, input.TeamName);
 
+            // Seed all compliance rules for brand-new tenants so they start with everything active.
+            if (input.TeamAction == "create")
+                await _activeRuleRepo.SeedAllRulesForTenantAsync(tenantId);
+
             // AbpSession.Use overrides the session claims for this scope, which is required
             // because UserRegistrationManager.CheckForTenant reads AbpSession.TenantId directly.
             // SetTenantId on the UoW only changes the DB filter — it does not affect AbpSession.
@@ -73,6 +84,17 @@ namespace FullStackProject.Authorization.Accounts
                     input.Password,
                     true
                 );
+
+                // The person who creates a team becomes its first admin.
+                // New tenants have no roles yet, so we create the Admin role first if it doesn't exist.
+                if (input.TeamAction == "create")
+                {
+                    var adminRole = await RoleManager.FindByNameAsync(StaticRoleNames.Tenants.Admin);
+                    if (adminRole == null)
+                        CheckErrors(await RoleManager.CreateAsync(new Role(tenantId, StaticRoleNames.Tenants.Admin, StaticRoleNames.Tenants.Admin) { IsStatic = true }));
+
+                    CheckErrors(await UserManager.AddToRoleAsync(user, StaticRoleNames.Tenants.Admin));
+                }
 
                 var requireConfirmation = await SettingManager.GetSettingValueAsync<bool>(
                     AbpZeroSettingNames.UserManagement.IsEmailConfirmationRequiredForLogin);

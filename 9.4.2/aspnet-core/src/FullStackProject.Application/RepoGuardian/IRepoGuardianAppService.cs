@@ -34,5 +34,11 @@ namespace FullStackProject.RepoGuardian
         /// No repository is registered and no scan run is persisted — results are returned directly.
         /// </summary>
         Task<ScanResultDto> QuickScanAsync(QuickScanRequest request);
+
+        /// <summary>Returns all rule definitions with their active/inactive status for the current tenant.</summary>
+        Task<List<RuleDefinitionDto>> GetRuleDefinitionsAsync();
+
+        /// <summary>Activates or deactivates a compliance rule for the current tenant.</summary>
+        Task ToggleRuleAsync(ToggleRuleRequest request);
     }
 }

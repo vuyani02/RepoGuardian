@@ -3,6 +3,7 @@ using System;
 using FullStackProject.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FullStackProject.Migrations
 {
     [DbContext(typeof(FullStackProjectDbContext))]
-    partial class FullStackProjectDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260401123526_AddRuleDefinitionsAndTenantActiveRules")]
+    partial class AddRuleDefinitionsAndTenantActiveRules
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1730,10 +1733,9 @@ namespace FullStackProject.Migrations
 
             modelBuilder.Entity("FullStackProject.Domains.RepoGuardian.RuleDefinition", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("RuleId")
                         .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("RuleId");
+                        .HasColumnType("character varying(20)");
 
                     b.Property<int>("Category")
                         .HasColumnType("integer");
@@ -1758,7 +1760,7 @@ namespace FullStackProject.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
 
-                    b.HasKey("Id");
+                    b.HasKey("RuleId");
 
                     b.ToTable("RuleDefinitions");
                 });

@@ -1,8 +1,10 @@
 'use client'
 
-import { Avatar, Card, Table, Typography } from 'antd'
+import { Avatar, Badge, Button, Card, Popconfirm, Table, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
+import { CrownOutlined, DeleteOutlined } from '@ant-design/icons'
 import { ITeamMember } from '@/Types/Profile/Types'
+import { useProfileActions } from '@/providers/profile'
 import { useStyles } from './styles/TeamProfileTab.style'
 
 const { Title } = Typography
@@ -17,47 +19,105 @@ const formatDate = (iso: string) => {
 interface TeamProfileTabProps {
   teamName: string
   teamMembers: ITeamMember[]
+  currentUserIsAdmin: boolean
+  currentUserId: number
   isPending: boolean
 }
 
-const columns: ColumnsType<ITeamMember> = [
-  {
-    title: '',
-    key: 'avatar',
-    width: 48,
-    render: (_, record) => (
-      <Avatar style={{ background: '#eef2ff', color: '#4f46e5', fontWeight: 600 }}>
-        {record.name.charAt(0).toUpperCase()}
-      </Avatar>
-    ),
-  },
-  {
-    title: 'Name',
-    key: 'name',
-    render: (_, record) => `${record.name} ${record.surname}`,
-  },
-  {
-    title: 'Username',
-    dataIndex: 'userName',
-    key: 'userName',
-  },
-  {
-    title: 'Email',
-    dataIndex: 'emailAddress',
-    key: 'emailAddress',
-    responsive: ['md'],
-  },
-  {
-    title: 'Joined',
-    dataIndex: 'joinedAt',
-    key: 'joinedAt',
-    responsive: ['lg'],
-    render: (val) => formatDate(val),
-  },
-]
-
-const TeamProfileTab = ({ teamName, teamMembers, isPending }: TeamProfileTabProps) => {
+const TeamProfileTab = ({ teamName, teamMembers, currentUserIsAdmin, currentUserId, isPending }: TeamProfileTabProps) => {
   const { styles } = useStyles()
+  const { makeAdmin, deleteMember } = useProfileActions()
+
+  const columns: ColumnsType<ITeamMember> = [
+    {
+      title: '',
+      key: 'avatar',
+      width: 48,
+      render: (_, record) => (
+        <Avatar style={{ background: '#eef2ff', color: '#4f46e5', fontWeight: 600 }}>
+          {record.name.charAt(0).toUpperCase()}
+        </Avatar>
+      ),
+    },
+    {
+      title: 'Name',
+      key: 'name',
+      render: (_, record) => (
+        <span>
+          {record.name} {record.surname}
+          {record.isAdmin && (
+            <Badge
+              count={<CrownOutlined style={{ color: '#f59e0b', fontSize: 12 }} />}
+              style={{ marginLeft: 6 }}
+            />
+          )}
+        </span>
+      ),
+    },
+    {
+      title: 'Username',
+      dataIndex: 'userName',
+      key: 'userName',
+    },
+    {
+      title: 'Email',
+      dataIndex: 'emailAddress',
+      key: 'emailAddress',
+      responsive: ['md'],
+    },
+    {
+      title: 'Role',
+      key: 'role',
+      render: (_, record) => (
+        <span className={record.isAdmin ? styles.roleAdmin : styles.roleMember}>
+          {record.isAdmin ? 'Admin' : 'Member'}
+        </span>
+      ),
+    },
+    {
+      title: 'Joined',
+      dataIndex: 'joinedAt',
+      key: 'joinedAt',
+      responsive: ['lg'],
+      render: (val) => formatDate(val),
+    },
+    ...(currentUserIsAdmin ? [{
+      title: 'Actions',
+      key: 'actions',
+      render: (_: unknown, record: ITeamMember) => {
+        const isSelf = record.id === currentUserId
+        return (
+          <div className={styles.actions}>
+            {!record.isAdmin && (
+              <Popconfirm
+                title="Make this user an admin?"
+                onConfirm={() => makeAdmin(record.id)}
+                okText="Yes"
+                cancelText="No"
+                okButtonProps={{ style: { background: '#4f46e5', borderColor: '#4f46e5' } }}
+              >
+                <Button size="small" icon={<CrownOutlined />} className={styles.makeAdminBtn}>
+                  Make Admin
+                </Button>
+              </Popconfirm>
+            )}
+            {!isSelf && (
+              <Popconfirm
+                title="Remove this user from the team?"
+                description="This cannot be undone."
+                onConfirm={() => deleteMember(record.id)}
+                okText="Remove"
+                cancelText="Cancel"
+                okButtonProps={{ danger: true }}
+              >
+                <Button size="small" danger icon={<DeleteOutlined />} />
+              </Popconfirm>
+            )}
+          </div>
+        )
+      },
+    }] : []),
+  ]
 
   return (
     <div className={styles.root}>

@@ -7,6 +7,7 @@ import { ScansProvider } from '@/providers/scans'
 import { DashboardProvider } from '@/providers/dashboard'
 import { RepositoryDetailProvider } from '@/providers/repositoryDetail'
 import { ProfileProvider } from '@/providers/profile'
+import { RulesProvider } from '@/providers/rules'
 
 const AppLayout = async ({ children }: { children: React.ReactNode }) => {
   await verifySession()
@@ -18,7 +19,9 @@ const AppLayout = async ({ children }: { children: React.ReactNode }) => {
           <ScansProvider>
             <DashboardProvider>
               <RepositoryDetailProvider>
-                {children}
+                <RulesProvider>
+                  {children}
+                </RulesProvider>
               </RepositoryDetailProvider>
             </DashboardProvider>
           </ScansProvider>

@@ -16,9 +16,19 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
       .catch(() => dispatch(getProfileError()))
   }
 
+  const makeAdmin = async (userId: number) => {
+    await axios.post('/api/team/make-admin', { userId })
+    await getProfile()
+  }
+
+  const deleteMember = async (userId: number) => {
+    await axios.post('/api/team/delete-user', { userId })
+    await getProfile()
+  }
+
   return (
     <ProfileStateContext.Provider value={state}>
-      <ProfileActionContext.Provider value={{ getProfile }}>
+      <ProfileActionContext.Provider value={{ getProfile, makeAdmin, deleteMember }}>
         {children}
       </ProfileActionContext.Provider>
     </ProfileStateContext.Provider>

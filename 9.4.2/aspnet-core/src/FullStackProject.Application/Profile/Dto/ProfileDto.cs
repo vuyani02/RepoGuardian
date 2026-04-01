@@ -8,5 +8,6 @@ namespace FullStackProject.UserProfile.Dto
         public UserProfileDto User { get; set; }
         public string TeamName { get; set; }
         public List<TeamMemberDto> TeamMembers { get; set; }
+        public bool CurrentUserIsAdmin { get; set; }
     }
 }

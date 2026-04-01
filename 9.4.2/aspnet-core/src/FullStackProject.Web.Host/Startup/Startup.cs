@@ -22,6 +22,7 @@ using System.IO;
 
 namespace FullStackProject.Web.Host.Startup
 {
+    /// <summary>Configures the ASP.NET Core middleware pipeline and dependency injection container.</summary>
     public class Startup
     {
         private const string _defaultCorsPolicyName = "localhost";
@@ -31,12 +32,14 @@ namespace FullStackProject.Web.Host.Startup
         private readonly IConfigurationRoot _appConfiguration;
         private readonly IWebHostEnvironment _hostingEnvironment;
 
+        /// <summary>Loads app configuration from the current hosting environment.</summary>
         public Startup(IWebHostEnvironment env)
         {
             _hostingEnvironment = env;
             _appConfiguration = env.GetAppConfiguration();
         }
 
+        /// <summary>Registers all services, CORS, authentication, SignalR, HTTP clients, and ABP into the DI container.</summary>
         public void ConfigureServices(IServiceCollection services)
         {
             // Render (and most cloud platforms) terminate TLS at the load balancer and forward
@@ -129,6 +132,7 @@ namespace FullStackProject.Web.Host.Startup
             );
         }
 
+        /// <summary>Builds the middleware pipeline: forwarded headers, CORS, ABP, routing, auth, Swagger, and SignalR.</summary>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             // Must be first — makes Request.IsHttps = true when behind Render's HTTPS proxy

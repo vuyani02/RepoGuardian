@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Abp.Authorization;
 using Abp.Domain.Repositories;
+using FullStackProject.Authorization.Roles;
 using FullStackProject.Authorization.Users;
 using FullStackProject.UserProfile.Dto;
 
@@ -27,6 +28,8 @@ namespace FullStackProject.UserProfile
             var tenant = await GetCurrentTenantAsync();
 
             var allUsers = await _userRepository.GetAllListAsync(u => u.TenantId == AbpSession.TenantId);
+            var adminUsers = await UserManager.GetUsersInRoleAsync(StaticRoleNames.Tenants.Admin);
+            var adminIds = adminUsers.Select(u => u.Id).ToHashSet();
 
             return new ProfileDto
             {
@@ -39,6 +42,7 @@ namespace FullStackProject.UserProfile
                     EmailAddress = currentUser.EmailAddress
                 },
                 TeamName = tenant.Name,
+                CurrentUserIsAdmin = adminIds.Contains(currentUser.Id),
                 TeamMembers = allUsers
                     .Select(u => new TeamMemberDto
                     {
@@ -47,7 +51,8 @@ namespace FullStackProject.UserProfile
                         Surname = u.Surname,
                         UserName = u.UserName,
                         EmailAddress = u.EmailAddress,
-                        JoinedAt = u.CreationTime
+                        JoinedAt = u.CreationTime,
+                        IsAdmin = adminIds.Contains(u.Id)
                     })
                     .OrderBy(m => m.Name)
                     .ToList()

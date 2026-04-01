@@ -11,5 +11,6 @@ namespace FullStackProject.UserProfile.Dto
         public string UserName { get; set; }
         public string EmailAddress { get; set; }
         public DateTime JoinedAt { get; set; }
+        public bool IsAdmin { get; set; }
     }
 }

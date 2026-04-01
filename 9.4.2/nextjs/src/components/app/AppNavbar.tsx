@@ -28,6 +28,7 @@ const navLinks = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/repositories', label: 'Repositories' },
   { href: '/scans', label: 'Scans' },
+  { href: '/rules', label: 'Rules' },
 ]
 
 const AppNavbar = () => {
