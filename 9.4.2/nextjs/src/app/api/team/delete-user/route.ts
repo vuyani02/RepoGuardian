@@ -7,8 +7,7 @@ export const POST = async (req: NextRequest) => {
   const { userId } = await req.json()
   try {
     await abpApiWithToken(accessToken).delete(
-      '/api/services/app/Team/DeleteTenantUser',
-      { data: { userId } }
+      `/api/services/app/Team/DeleteTenantUser?userId=${userId}`
     )
     return NextResponse.json({ success: true })
   } catch (err: unknown) {
