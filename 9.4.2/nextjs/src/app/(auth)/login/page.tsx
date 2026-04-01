@@ -9,6 +9,7 @@ import { useStyles } from './style'
 type LoginValues = {
   username: string
   password: string
+  teamName: string
 }
 
 const ShieldIcon = () => {
@@ -112,6 +113,14 @@ const LoginForm = () => {
           )}
 
           <Form layout="vertical" requiredMark={false} onFinish={onFinish}>
+            <Form.Item
+              label={<span className={styles.label}>Team name</span>}
+              name="teamName"
+              rules={[{ required: true, message: 'Team name is required' }]}
+            >
+              <Input size="large" placeholder="Enter your team name" style={{ borderRadius: 10 }} />
+            </Form.Item>
+
             <Form.Item
               label={<span className={styles.label}>Username</span>}
               name="username"

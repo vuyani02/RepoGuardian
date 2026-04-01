@@ -1,12 +1,16 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
 
 namespace FullStackProject.Domains.RepoGuardian
 {
-    public class ScanRun : FullAuditedEntity<Guid>
+    /// <summary>Represents a single scan execution against a GitHub repository.</summary>
+    public class ScanRun : FullAuditedEntity<Guid>, IMustHaveTenant
     {
+        public int TenantId { get; set; }
+
         public Guid RepositoryId { get; set; }
 
         [ForeignKey("RepositoryId")]

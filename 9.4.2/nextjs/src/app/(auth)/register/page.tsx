@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Alert, Button, Col, Form, Input, Row, Typography } from 'antd'
+import { Alert, Button, Col, Form, Input, Radio, Row, Typography } from 'antd'
 import { useStyles } from './style'
 
 type RegisterValues = {
@@ -12,6 +12,8 @@ type RegisterValues = {
   userName: string
   emailAddress: string
   password: string
+  teamAction: 'create' | 'join'
+  teamName: string
 }
 
 const ShieldIcon = () => {
@@ -32,6 +34,7 @@ const ShieldIcon = () => {
 const RegisterPage = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [teamAction, setTeamAction] = useState<'create' | 'join'>('create')
   const router = useRouter()
   const { styles } = useStyles()
 
@@ -165,6 +168,32 @@ const RegisterPage = () => {
               ]}
             >
               <Input.Password size="large" placeholder="Min 8 chars, uppercase, number" style={{ borderRadius: 10 }} />
+            </Form.Item>
+
+            <Form.Item
+              label={<span className={styles.label}>Team</span>}
+              name="teamAction"
+              initialValue="create"
+            >
+              <Radio.Group
+                onChange={(e) => setTeamAction(e.target.value)}
+                className={styles.radioGroup}
+              >
+                <Radio.Button value="create">Create a team</Radio.Button>
+                <Radio.Button value="join">Join a team</Radio.Button>
+              </Radio.Group>
+            </Form.Item>
+
+            <Form.Item
+              label={<span className={styles.label}>{teamAction === 'create' ? 'Team name' : "Enter your team's name"}</span>}
+              name="teamName"
+              rules={[{ required: true, message: 'Team name is required' }]}
+            >
+              <Input
+                size="large"
+                placeholder={teamAction === 'create' ? 'e.g. Acme Corp' : 'Enter the exact team name'}
+                style={{ borderRadius: 10 }}
+              />
             </Form.Item>
 
             <Form.Item className={styles.submitItem}>

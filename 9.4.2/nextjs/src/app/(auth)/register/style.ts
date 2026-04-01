@@ -164,6 +164,26 @@ export const useStyles = createStyles(({ css }) => ({
     margin-bottom: 20px;
     border-radius: 10px;
   `,
+  radioGroup: css`
+    width: 100%;
+    display: flex;
+
+    .ant-radio-button-wrapper {
+      flex: 1;
+      text-align: center;
+      height: 42px !important;
+      line-height: 40px !important;
+      font-weight: 500;
+    }
+
+    .ant-radio-button-wrapper:first-child {
+      border-radius: 10px 0 0 10px !important;
+    }
+
+    .ant-radio-button-wrapper:last-child {
+      border-radius: 0 10px 10px 0 !important;
+    }
+  `,
   submitItem: css`
     margin-bottom: 0;
   `,

@@ -2,8 +2,9 @@ import { createStyles } from 'antd-style'
 
 export const useStyles = createStyles(({ css }) => ({
   page: css`
-    padding: 32px 40px;
     max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 40px;
 
     @media (max-width: 768px) {
       padding: 24px 16px;

@@ -34,6 +34,15 @@ namespace FullStackProject.Authorization.Accounts.Dto
         [DisableAuditing]
         public string CaptchaResponse { get; set; }
 
+        /// <summary>"create" to create a new team, "join" to join an existing team by name.</summary>
+        [Required]
+        public string TeamAction { get; set; }
+
+        /// <summary>The team name to create or join.</summary>
+        [Required]
+        [StringLength(64)]
+        public string TeamName { get; set; }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (!UserName.IsNullOrEmpty())
