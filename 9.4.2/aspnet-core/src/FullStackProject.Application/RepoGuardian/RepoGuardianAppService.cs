@@ -59,8 +59,9 @@ namespace FullStackProject.RepoGuardian
             var userId = AbpSession.GetUserId();
             var normalized = request.GithubUrl.TrimEnd('/').ToLowerInvariant();
 
+            // ABP's IMustHaveTenant filter already scopes this query to the current tenant.
             var existing = await _repositoryRepo.FirstOrDefaultAsync(
-                r => r.GithubUrl.ToLower() == normalized && r.UserId == userId);
+                r => r.GithubUrl.ToLower() == normalized);
 
             if (existing != null)
             {
