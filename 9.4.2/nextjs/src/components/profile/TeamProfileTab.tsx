@@ -81,6 +81,7 @@ const TeamProfileTab = ({ teamName, teamMembers, isPending }: TeamProfileTabProp
           loading={isPending}
           pagination={{ defaultPageSize: 4, showSizeChanger: true, pageSizeOptions: ['4', '10', '20'] }}
           size="small"
+          scroll={{ x: 'max-content' }}
         />
       </Card>
     </div>
