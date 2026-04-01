@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Abp.Authorization;
 using Abp.Domain.Repositories;
 using Abp.Runtime.Session;
+using Abp.UI;
 using FullStackProject.Domains.RepoGuardian;
 using FullStackProject.RepoGuardian.AI;
 using FullStackProject.RepoGuardian.Dto;
@@ -24,29 +25,35 @@ namespace FullStackProject.RepoGuardian
         private readonly GithubService _githubService;
         private readonly RuleEngine _ruleEngine;
         private readonly AiExplanationService _aiExplanationService;
+        private readonly IActiveRuleRepository _activeRuleRepo;
         private readonly IRepository<GithubRepository, Guid> _repositoryRepo;
         private readonly IRepository<ScanRun, Guid> _scanRunRepo;
         private readonly IRepository<ComplianceScore, Guid> _complianceScoreRepo;
         private readonly IRepository<RuleResult, Guid> _ruleResultRepo;
+        private readonly IRepository<RuleDefinition, string> _ruleDefinitionRepo;
 
         public RepoGuardianAppService(
             RepoGuardianManager repoGuardianManager,
             GithubService githubService,
             RuleEngine ruleEngine,
             AiExplanationService aiExplanationService,
+            IActiveRuleRepository activeRuleRepo,
             IRepository<GithubRepository, Guid> repositoryRepo,
             IRepository<ScanRun, Guid> scanRunRepo,
             IRepository<ComplianceScore, Guid> complianceScoreRepo,
-            IRepository<RuleResult, Guid> ruleResultRepo)
+            IRepository<RuleResult, Guid> ruleResultRepo,
+            IRepository<RuleDefinition, string> ruleDefinitionRepo)
         {
             _repoGuardianManager = repoGuardianManager;
             _githubService = githubService;
             _ruleEngine = ruleEngine;
             _aiExplanationService = aiExplanationService;
+            _activeRuleRepo = activeRuleRepo;
             _repositoryRepo = repositoryRepo;
             _scanRunRepo = scanRunRepo;
             _complianceScoreRepo = complianceScoreRepo;
             _ruleResultRepo = ruleResultRepo;
+            _ruleDefinitionRepo = ruleDefinitionRepo;
         }
 
         /// <summary>
@@ -104,7 +111,9 @@ namespace FullStackProject.RepoGuardian
                 var repository = await _repositoryRepo.GetAsync(request.RepositoryId);
                 var filePaths = await _githubService.GetFileTreeAsync(repository.Owner, repository.Name);
 
-                var ruleResults = _ruleEngine.Evaluate(scanRun.Id, filePaths);
+                var tenantId = AbpSession.GetTenantId();
+                var activeRuleIds = await _activeRuleRepo.GetActiveRuleIdsAsync(tenantId);
+                var ruleResults = _ruleEngine.Evaluate(scanRun.Id, filePaths, activeRuleIds);
                 await _repoGuardianManager.SaveRuleResultsAsync(ruleResults);
                 await _repoGuardianManager.CalculateAndSaveScoresAsync(scanRun.Id, ruleResults);
 
@@ -384,6 +393,42 @@ namespace FullStackProject.RepoGuardian
                 }).ToList(),
                 Recommendations = recommendations
             };
+        }
+
+        /// <summary>
+        /// Returns all rule definitions with their active/inactive status for the current tenant.
+        /// </summary>
+        public async Task<List<RuleDefinitionDto>> GetRuleDefinitionsAsync()
+        {
+            var tenantId = AbpSession.GetTenantId();
+            var definitions = await _ruleDefinitionRepo.GetAllListAsync();
+            var activeIds = (await _activeRuleRepo.GetActiveRuleIdsAsync(tenantId)).ToHashSet();
+
+            return definitions
+                .OrderBy(d => d.Category)
+                .ThenBy(d => d.Id)
+                .Select(d => new RuleDefinitionDto
+                {
+                    RuleId = d.Id,
+                    RuleName = d.RuleName,
+                    Category = d.Category.ToString(),
+                    WhatIsIt = d.WhatIsIt,
+                    WhyItMatters = d.WhyItMatters,
+                    HowToAdd = d.HowToAdd,
+                    IsActive = activeIds.Contains(d.Id)
+                })
+                .ToList();
+        }
+
+        /// <summary>Activates or deactivates a compliance rule for the current tenant.</summary>
+        public async Task ToggleRuleAsync(ToggleRuleRequest request)
+        {
+            var tenantId = AbpSession.GetTenantId();
+
+            if (request.Activate)
+                await _activeRuleRepo.ActivateRuleAsync(tenantId, request.RuleId);
+            else
+                await _activeRuleRepo.DeactivateRuleAsync(tenantId, request.RuleId);
         }
 
         /// <summary>Calculates per-category scores from in-memory rule results without touching the database.</summary>
