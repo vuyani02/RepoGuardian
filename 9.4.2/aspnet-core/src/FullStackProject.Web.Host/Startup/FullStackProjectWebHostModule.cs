@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Abp.Modules;
 using Abp.Reflection.Extensions;
 using FullStackProject.Configuration;
-using FullStackProject.RepoGuardian;
 
 namespace FullStackProject.Web.Host.Startup
 {
@@ -23,14 +22,6 @@ namespace FullStackProject.Web.Host.Startup
         public override void Initialize()
         {
             IocManager.RegisterAssemblyByConvention(typeof(FullStackProjectWebHostModule).GetAssembly());
-        }
-
-        public override void PostInitialize()
-        {
-            // Seed AI-generated rule definitions once. Safe to re-run — skips existing rows.
-            // DELETE this call and RuleDefinitionSeeder.cs after the seed has been applied to production.
-            var seeder = IocManager.Resolve<RuleDefinitionSeeder>();
-            seeder.SeedAsync().GetAwaiter().GetResult();
         }
     }
 }
