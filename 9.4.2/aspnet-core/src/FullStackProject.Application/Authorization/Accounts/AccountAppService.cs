@@ -20,6 +20,8 @@ namespace FullStackProject.Authorization.Accounts
         private readonly IRepository<Tenant> _tenantRepository;
         private readonly IActiveRuleRepository _activeRuleRepo;
 
+        public RoleManager RoleManager { get; set; }
+
         public AccountAppService(
             UserRegistrationManager userRegistrationManager,
             IUnitOfWorkManager unitOfWorkManager,
@@ -84,8 +86,15 @@ namespace FullStackProject.Authorization.Accounts
                 );
 
                 // The person who creates a team becomes its first admin.
+                // New tenants have no roles yet, so we create the Admin role first if it doesn't exist.
                 if (input.TeamAction == "create")
+                {
+                    var adminRole = await RoleManager.FindByNameAsync(StaticRoleNames.Tenants.Admin);
+                    if (adminRole == null)
+                        CheckErrors(await RoleManager.CreateAsync(new Role(tenantId, StaticRoleNames.Tenants.Admin, StaticRoleNames.Tenants.Admin) { IsStatic = true }));
+
                     CheckErrors(await UserManager.AddToRoleAsync(user, StaticRoleNames.Tenants.Admin));
+                }
 
                 var requireConfirmation = await SettingManager.GetSettingValueAsync<bool>(
                     AbpZeroSettingNames.UserManagement.IsEmailConfirmationRequiredForLogin);
