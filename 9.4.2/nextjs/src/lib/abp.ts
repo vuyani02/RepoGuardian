@@ -25,6 +25,18 @@ export const abpApi = withTenantParam(
   })
 )
 
+export const abpApiForTenant = (tenantId: number) =>
+  withTenantParam(
+    axios.create({
+      baseURL: process.env.API_URL,
+      headers: {
+        'Content-Type': 'application/json',
+        'Abp.TenantId': String(tenantId),
+      },
+      params: { 'Abp.TenantId': tenantId },
+    })
+  )
+
 export const abpApiWithToken = (token: string) =>
   withTenantParam(
     axios.create({
