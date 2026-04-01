@@ -29,7 +29,8 @@ namespace FullStackProject.EntityFrameworkCore
             // Map Entity<string>.Id to the "RuleId" column in the DB.
             modelBuilder.Entity<RuleDefinition>()
                 .Property(r => r.Id)
-                .HasColumnName("RuleId");
+                .HasColumnName("RuleId")
+                .HasMaxLength(20);
 
             // Composite PK: one row per tenant per rule.
             modelBuilder.Entity<TenantActiveRule>()
