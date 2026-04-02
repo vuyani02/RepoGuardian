@@ -29,7 +29,12 @@ const SCOPE_OPTIONS = [
   { label: 'All scans', value: false },
 ]
 
-const DEFAULT_FILTERS: IDashboardFilters = { daysBack: 7, latestPerRepo: true }
+const BRANCH_OPTIONS = [
+  { label: 'Default branch only (main/master)', value: true },
+  { label: 'All branches', value: false },
+]
+
+const DEFAULT_FILTERS: IDashboardFilters = { daysBack: 7, latestPerRepo: true, defaultBranchOnly: true }
 
 const scoreVariant = (score: number | null): 'green' | 'amber' | 'red' | 'default' => {
   if (score === null) return 'default'
@@ -86,6 +91,12 @@ const DashboardPage = () => {
           options={SCOPE_OPTIONS}
           value={filters.latestPerRepo}
           onChange={(val) => setFilters((f) => ({ ...f, latestPerRepo: val }))}
+          className={styles.filterSelect}
+        />
+        <Select
+          options={BRANCH_OPTIONS}
+          value={filters.defaultBranchOnly}
+          onChange={(val) => setFilters((f) => ({ ...f, defaultBranchOnly: val }))}
           className={styles.filterSelect}
         />
       </div>

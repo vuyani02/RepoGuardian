@@ -96,4 +96,16 @@ export const useStyles = createStyles(({ css }) => ({
     width: 140px !important;
     height: 18px !important;
   `,
+  defaultBranchBadge: css`
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #6b7280;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 99px;
+    padding: 1px 8px;
+  `,
 }))

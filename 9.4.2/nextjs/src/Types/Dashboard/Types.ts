@@ -35,6 +35,7 @@ export interface IDashboardStats {
 export interface IDashboardFilters {
   daysBack: number | null
   latestPerRepo: boolean
+  defaultBranchOnly: boolean
 }
 
 export interface MostRecentScanStripProps {

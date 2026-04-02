@@ -54,6 +54,12 @@ export const useStyles = createStyles(({ css }) => ({
     color: #6b7280 !important;
     font-size: 14px !important;
   `,
+  branchLabel: css`
+    display: block;
+    margin-top: 4px;
+    color: #6b7280 !important;
+    font-size: 13px !important;
+  `,
   sectionTitle: css`
     font-size: 13px !important;
     font-weight: 700 !important;

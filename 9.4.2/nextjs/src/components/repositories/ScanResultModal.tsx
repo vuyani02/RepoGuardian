@@ -165,6 +165,11 @@ const ScanResultBody = ({
           <Text className={styles.rulesPassedText}>
             {scanResult.ruleResults.filter((r) => r.passed).length} of {scanResult.ruleResults.length} rules passed
           </Text>
+          {scanResult.branch && (
+            <Text className={styles.branchLabel}>
+              Branch: <strong>{scanResult.branch}</strong>
+            </Text>
+          )}
         </div>
       </div>
 

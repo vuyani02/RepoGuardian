@@ -43,7 +43,12 @@ const RepositoryDetailPage = ({ params }: { params: Promise<{ id: string }> }) =
     }
   }
 
-  const lastScanScore = detail?.scans?.find((s) => s.status === 'Completed')?.overallScore ?? null
+  const DEFAULT_BRANCHES = ['main', 'master']
+  const defaultBranchScan = detail?.scans?.find(
+    (s) => s.status === 'Completed' && DEFAULT_BRANCHES.includes(s.branch ?? '')
+  ) ?? detail?.scans?.find((s) => s.status === 'Completed') ?? null
+  const lastScanScore = defaultBranchScan?.overallScore ?? null
+  const lastScanBranch = defaultBranchScan?.branch ?? null
 
   return (
     <div className={styles.content}>
@@ -59,6 +64,7 @@ const RepositoryDetailPage = ({ params }: { params: Promise<{ id: string }> }) =
       <RepoDetailHeader
         repository={detail?.repository}
         lastScanScore={lastScanScore}
+        lastScanBranch={lastScanBranch}
         isPending={isPending}
         onScan={handleScan}
         isScanning={isScanning}

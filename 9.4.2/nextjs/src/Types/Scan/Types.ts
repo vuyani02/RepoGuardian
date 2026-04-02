@@ -26,6 +26,7 @@ export interface IScanSummary {
   owner: string
   status: string
   overallScore: number | null
+  branch: string | null
   triggeredAt: string
   completedAt: string | null
 }
@@ -51,6 +52,7 @@ export interface IScanResult {
   scanRunId: string
   status: string
   overallScore: number | null
+  branch: string | null
   triggeredAt: string
   completedAt: string | null
   errorMessage: string | null

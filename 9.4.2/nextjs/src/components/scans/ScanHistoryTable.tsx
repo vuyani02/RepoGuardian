@@ -64,6 +64,13 @@ const ScanHistoryTable = ({ onView }: ScanHistoryTableProps) => {
       ),
     },
     {
+      title: 'Branch',
+      key: 'branch',
+      minWidth: 100,
+      render: (_: unknown, row: IScanSummary) =>
+        row.branch ?? <span className={styles.owner}>—</span>,
+    },
+    {
       title: 'Date',
       key: 'triggeredAt',
       minWidth: 160,

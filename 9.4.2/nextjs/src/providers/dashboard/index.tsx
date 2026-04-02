@@ -11,7 +11,10 @@ export const DashboardProvider = ({ children }: { children: React.ReactNode }) =
   const [state, dispatch] = useReducer(DashboardReducer, INITIAL_STATE)
 
   const getDashboardStats = async (filters: IDashboardFilters) => {
-    const params: Record<string, string> = { latestPerRepo: String(filters.latestPerRepo) }
+    const params: Record<string, string> = {
+      latestPerRepo: String(filters.latestPerRepo),
+      defaultBranchOnly: String(filters.defaultBranchOnly),
+    }
     if (filters.daysBack !== null) params['daysBack'] = String(filters.daysBack)
 
     dispatch(getDashboardStatsPending())

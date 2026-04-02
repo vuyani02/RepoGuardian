@@ -20,6 +20,7 @@ export interface AddRepositoryModalProps {
 export interface RepoDetailHeaderProps {
   repository: IRepository | undefined
   lastScanScore: number | null
+  lastScanBranch: string | null
   isPending: boolean
   onScan: () => void
   isScanning: boolean

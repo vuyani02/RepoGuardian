@@ -14,7 +14,7 @@ const scoreBadgeKey = (score: number | null) => {
   return 'scoreRed'
 }
 
-const RepoDetailHeader = ({ repository, lastScanScore, isPending, onScan, isScanning }: RepoDetailHeaderProps) => {
+const RepoDetailHeader = ({ repository, lastScanScore, lastScanBranch, isPending, onScan, isScanning }: RepoDetailHeaderProps) => {
   const { styles } = useStyles()
 
   return (
@@ -34,6 +34,11 @@ const RepoDetailHeader = ({ repository, lastScanScore, isPending, onScan, isScan
               <span className={`${styles.scoreBadge} ${styles[scoreBadgeKey(lastScanScore)]}`}>
                 {lastScanScore !== null ? `${lastScanScore}%` : 'No scans yet'}
               </span>
+              {lastScanBranch && (
+                <span className={styles.defaultBranchBadge}>
+                  {lastScanBranch}
+                </span>
+              )}
             </div>
             <Text className={styles.owner}>
               <UserOutlined /> {repository?.owner}

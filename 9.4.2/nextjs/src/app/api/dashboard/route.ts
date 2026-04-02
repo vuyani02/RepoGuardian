@@ -9,6 +9,7 @@ export async function GET(req: NextRequest) {
   const params: Record<string, string> = {}
   if (searchParams.has('daysBack')) params['daysBack'] = searchParams.get('daysBack')!
   if (searchParams.has('latestPerRepo')) params['latestPerRepo'] = searchParams.get('latestPerRepo')!
+  if (searchParams.has('defaultBranchOnly')) params['defaultBranchOnly'] = searchParams.get('defaultBranchOnly')!
 
   const { data } = await abpApiWithToken(accessToken).get(
     '/api/services/app/RepoGuardian/GetDashboardStats',

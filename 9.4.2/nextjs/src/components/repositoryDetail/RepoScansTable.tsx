@@ -24,6 +24,13 @@ const RepoScansTable = ({ scans, isPending, onView }: RepoScansTableProps) => {
 
   const columns = [
     {
+      title: 'Branch',
+      key: 'branch',
+      minWidth: 100,
+      render: (_: unknown, row: IScanSummary) =>
+        row.branch ?? <span className={styles.scorePending}>—</span>,
+    },
+    {
       title: 'Date',
       key: 'triggeredAt',
       minWidth: 160,
