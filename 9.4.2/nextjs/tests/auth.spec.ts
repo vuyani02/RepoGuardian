@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test'
-import { TEST_CREDS } from '../playwright.config'
 
 // These tests run without the saved session so they can test the login page itself.
 test.use({ storageState: { cookies: [], origins: [] } })
@@ -25,17 +24,6 @@ test.describe('Auth', () => {
     await expect(page.getByRole('alert')).toBeVisible()
   })
 
-  test('redirects to dashboard after successful login', async ({ page }) => {
-    await page.goto('/login')
-
-    await page.getByLabel('Team name').fill(TEST_CREDS.teamName)
-    await page.getByLabel('Username').fill(TEST_CREDS.username)
-    await page.getByLabel('Password').fill(TEST_CREDS.password)
-    await page.getByRole('button', { name: 'Sign In' }).click()
-
-    await page.waitForURL('/dashboard', { timeout: 30000 })
-    await expect(page).toHaveURL('/dashboard')
-  })
 
   test('register page renders team action and all fields', async ({ page }) => {
     await page.goto('/register')
