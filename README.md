@@ -10,7 +10,7 @@ RepoGuardian demonstrates real-world multi-tenant architecture, a rule engine wi
 
 ## 🌐 Live Demo
 
-🔗 Coming soon
+https://repo-guardian.vercel.app/
 
 ---
 
@@ -86,20 +86,27 @@ RepoGuardian demonstrates real-world multi-tenant architecture, a rule engine wi
 
 ### 7. Compliance Rules
 
-10 rules across 5 categories:
+17 rules across 5 categories:
 
 | Rule ID | Name | Category |
 |---------|------|----------|
 | DOC_001 | README exists | Documentation |
 | DOC_002 | LICENSE exists | Documentation |
 | DOC_003 | CONTRIBUTING guide exists | Documentation |
+| DOC_005 | Code of conduct | Documentation |
+| DOC_004 | Changelog | Documentation |
 | TEST_001 | Test files or test directory exists | Testing |
+| TEST_002 | Test coverage configuration | Testing |
 | CICD_001 | CI/CD pipeline configured | CI/CD |
-| CICD_002 | Linting or formatting config exists | CI/CD |
+| CICD_002 | PR or issue templates | CI/CD |
+| CICD_003 | Containerisation (Docker) | CI/CD |
+| CICD_004 | Linting or formatting config exists | CI/CD |
 | DEP_001 | Dependency lock file exists | Dependencies |
+| DEP_002 | Dependency update automation | Dependencies |
 | SEC_001 | .gitignore exists | Security |
 | SEC_002 | No .env files committed | Security |
 | SEC_003 | Security policy or CODEOWNERS exists | Security |
+| SEC_004 | .env.example documents environment variables | Security |
 
 ### 8. AI Recommendations
 - Powered by Google Gemini (`gemini-2.5-flash`)
