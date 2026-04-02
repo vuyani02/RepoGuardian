@@ -1,24 +1,49 @@
-version: '3'
+version: '3.8'
 
 services:
 
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: FullStackProjectDb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   abp_host:
-    image: abp/host
+    build:
+      context: ../../
+      dockerfile: src/FullStackProject.Web.Host/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: "Staging"
-      ConnectionStrings__Default: "Server=10.0.75.1; Database=FullStackProjectDb; User=FullStackProjectUser; Password=YourStrongPassword;TrustServerCertificate=True;"
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=FullStackProjectDb;Username=postgres;Password=postgres"
       App__ServerRootAddress: "http://localhost:44311/"
-      App__ClientRootAddress: "http://localhost:4200/"
-      App__CorsOrigins: "http://localhost:4200"
-      TZ: "America/Toronto"
-      Kestrel__Endpoints__Http__Url: "http://+:80"
+      App__ClientRootAddress: "http://localhost:3000/"
+      App__CorsOrigins: "http://localhost:3000"
+      Kestrel__Endpoints__Http__Url: "http://+:44311"
+      Authentication__JwtBearer__SecurityKey: "FullStackProject_7AADAF7B66964EE39AE121FB392CE481"
+      Authentication__JwtBearer__Issuer: "FullStackProject"
+      Authentication__JwtBearer__Audience: "FullStackProject"
+      GitHub__ApiBaseUrl: "https://api.github.com/"
+      Gemini__ApiBaseUrl: "https://generativelanguage.googleapis.com/v1beta/openai/"
+      Gemini__Model: "gemini-2.5-flash"
+      # Set Gemini__ApiKey via .env file or environment variable — never commit it
     ports:
-      - "44311:80"
+      - "44311:44311"
+    depends_on:
+      postgres:
+        condition: service_healthy
     volumes:
-      - "./Host-Logs:/app/App_Data/Logs"
-    restart: always
+      - ./Host-Logs:/app/App_Data/Logs
+    restart: on-failure
 
-  abp_ng:
-    image: abp/ng
-    ports:
-      - "4200:80"
+volumes:
+  postgres_data:
