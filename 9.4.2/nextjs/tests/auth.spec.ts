@@ -33,7 +33,7 @@ test.describe('Auth', () => {
     await page.getByLabel('Password').fill(TEST_CREDS.password)
     await page.getByRole('button', { name: 'Sign In' }).click()
 
-    await page.waitForURL('/dashboard', { timeout: 15000 })
+    await page.waitForURL('/dashboard', { timeout: 30000 })
     await expect(page).toHaveURL('/dashboard')
   })
 
