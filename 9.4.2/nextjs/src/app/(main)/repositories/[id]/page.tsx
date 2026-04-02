@@ -10,6 +10,7 @@ import RepoDetailHeader from '@/components/repositoryDetail/RepoDetailHeader'
 import RepoTrendChart from '@/components/repositoryDetail/RepoTrendChart'
 import RepoScansTable from '@/components/repositoryDetail/RepoScansTable'
 import ScanResultModal from '@/components/repositories/ScanResultModal'
+import BranchScanModal from '@/components/repositories/BranchScanModal'
 import { IScanResult } from '@/Types/Scan/Types'
 import { useStyles } from './style'
 
@@ -21,6 +22,7 @@ const RepositoryDetailPage = ({ params }: { params: Promise<{ id: string }> }) =
   const { getRepositoryDetail } = useRepositoryDetailActions()
   const [viewedResult, setViewedResult] = useState<IScanResult | null>(null)
   const [isScanning, setIsScanning] = useState(false)
+  const [branchModalOpen, setBranchModalOpen] = useState(false)
 
   useEffect(() => {
     getRepositoryDetail(id)
@@ -32,10 +34,11 @@ const RepositoryDetailPage = ({ params }: { params: Promise<{ id: string }> }) =
     setViewedResult(res.data)
   }
 
-  const handleScan = async () => {
+  const handleScanConfirm = async (branch: string) => {
+    setBranchModalOpen(false)
     setIsScanning(true)
     try {
-      const res = await axios.post('/api/repositories/scan', { repositoryId: id })
+      const res = await axios.post('/api/repositories/scan', { repositoryId: id, branch })
       setViewedResult(res.data)
       getRepositoryDetail(id)
     } finally {
@@ -61,12 +64,19 @@ const RepositoryDetailPage = ({ params }: { params: Promise<{ id: string }> }) =
         Back to Repositories
       </Button>
 
+      <BranchScanModal
+        open={branchModalOpen}
+        repositoryId={id}
+        onCancel={() => setBranchModalOpen(false)}
+        onConfirm={handleScanConfirm}
+      />
+
       <RepoDetailHeader
         repository={detail?.repository}
         lastScanScore={lastScanScore}
         lastScanBranch={lastScanBranch}
         isPending={isPending}
-        onScan={handleScan}
+        onScan={() => setBranchModalOpen(true)}
         isScanning={isScanning}
       />
 

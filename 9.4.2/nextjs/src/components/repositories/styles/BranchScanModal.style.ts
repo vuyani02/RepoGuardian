@@ -16,8 +16,24 @@ export const useStyles = createStyles(({ css }) => ({
   `,
   cancelBtn: css`
     min-width: 80px;
+    border-radius: 10px !important;
+    font-weight: 500 !important;
+
+    &:hover:not(:disabled) {
+      color: #4f46e5 !important;
+      border-color: #4f46e5 !important;
+    }
   `,
   scanBtn: css`
     min-width: 80px;
+    background: #4f46e5 !important;
+    border-color: #4f46e5 !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+
+    &:hover:not(:disabled) {
+      background: #4338ca !important;
+      border-color: #4338ca !important;
+    }
   `,
 }))
