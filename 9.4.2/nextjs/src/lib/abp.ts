@@ -9,7 +9,7 @@ const DEFAULT_TENANT_ID = 1
 // tenant resolver runs.
 const withTenantParam = (instance: AxiosInstance): AxiosInstance => {
   instance.interceptors.request.use((config) => {
-    config.params = { ...config.params, 'Abp.TenantId': DEFAULT_TENANT_ID }
+    config.params = { 'Abp.TenantId': DEFAULT_TENANT_ID, ...config.params }
     return config
   })
   return instance
