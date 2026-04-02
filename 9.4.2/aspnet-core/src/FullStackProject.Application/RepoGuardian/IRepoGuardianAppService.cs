@@ -40,5 +40,8 @@ namespace FullStackProject.RepoGuardian
 
         /// <summary>Activates or deactivates a compliance rule for the current tenant.</summary>
         Task ToggleRuleAsync(ToggleRuleRequest request);
+
+        /// <summary>Returns all branch names for the given registered repository.</summary>
+        Task<List<string>> GetBranchesAsync(Guid repositoryId);
     }
 }

@@ -110,7 +110,7 @@ namespace FullStackProject.RepoGuardian
                 await _repoGuardianManager.UpdateScanStatusAsync(scanRun.Id, ScanRunStatus.Running);
 
                 var repository = await _repositoryRepo.GetAsync(request.RepositoryId);
-                var filePaths = await _githubService.GetFileTreeAsync(repository.Owner, repository.Name);
+                var filePaths = await _githubService.GetFileTreeAsync(repository.Owner, repository.Name, request.Branch);
 
                 var tenantId = AbpSession.GetTenantId();
                 var activeRuleIds = await _activeRuleRepo.GetActiveRuleIdsAsync(tenantId);
@@ -359,7 +359,7 @@ namespace FullStackProject.RepoGuardian
         public async Task<ScanResultDto> QuickScanAsync(QuickScanRequest request)
         {
             var (owner, name) = _repoGuardianManager.ParseGithubUrl(request.GithubUrl);
-            var filePaths = await _githubService.GetFileTreeAsync(owner, name);
+            var filePaths = await _githubService.GetFileTreeAsync(owner, name, request.Branch);
 
             // Use a transient ID — results are never persisted so this ID is meaningless
             var transientId = Guid.NewGuid();
@@ -419,6 +419,13 @@ namespace FullStackProject.RepoGuardian
                     IsActive = activeIds.Contains(d.Id)
                 })
                 .ToList();
+        }
+
+        /// <summary>Returns all branch names for the given registered repository.</summary>
+        public async Task<List<string>> GetBranchesAsync(Guid repositoryId)
+        {
+            var repository = await _repositoryRepo.GetAsync(repositoryId);
+            return await _githubService.GetBranchesAsync(repository.Owner, repository.Name);
         }
 
         /// <summary>Activates or deactivates a compliance rule for the current tenant. Caller must be an admin.</summary>

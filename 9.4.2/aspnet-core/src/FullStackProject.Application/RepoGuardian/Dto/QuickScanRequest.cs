@@ -8,5 +8,8 @@ namespace FullStackProject.RepoGuardian.Dto
         /// <summary>Full GitHub repository URL (e.g. https://github.com/owner/repo).</summary>
         [Required]
         public string GithubUrl { get; set; }
+
+        /// <summary>Branch to scan. If null the repository's default branch is used.</summary>
+        public string Branch { get; set; }
     }
 }
