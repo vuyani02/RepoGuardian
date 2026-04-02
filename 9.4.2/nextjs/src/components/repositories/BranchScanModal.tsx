@@ -24,16 +24,20 @@ const BranchScanModal = ({ open, repositoryId, onCancel, onConfirm }: BranchScan
 
   useEffect(() => {
     if (!open || !repositoryId) return
-    setIsLoading(true)
-    setError(null)
-    setSelectedBranch(undefined)
-    axios.get(`/api/repositories/${repositoryId}/branches`)
-      .then((res) => {
+    void (async () => {
+      setIsLoading(true)
+      setError(null)
+      setSelectedBranch(undefined)
+      try {
+        const res = await axios.get(`/api/repositories/${repositoryId}/branches`)
         setBranches(res.data ?? [])
         if (res.data?.length > 0) setSelectedBranch(res.data[0])
-      })
-      .catch(() => setError('Could not load branches. Please try again.'))
-      .finally(() => setIsLoading(false))
+      } catch {
+        setError('Could not load branches. Please try again.')
+      } finally {
+        setIsLoading(false)
+      }
+    })()
   }, [open, repositoryId])
 
   const handleConfirm = () => {
