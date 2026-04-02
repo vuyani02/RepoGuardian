@@ -66,12 +66,13 @@ namespace FullStackProject.Domains.RepoGuardian
             });
         }
 
-        public async Task<ScanRun> CreateScanRunAsync(Guid repositoryId)
+        public async Task<ScanRun> CreateScanRunAsync(Guid repositoryId, string branch = null)
         {
-            Logger.InfoFormat("Creating scan run for repository {0}", repositoryId);
+            Logger.InfoFormat("Creating scan run for repository {0} (branch: {1})", repositoryId, branch ?? "default");
             var scanRun = await _scanRunRepo.InsertAsync(new ScanRun
             {
                 RepositoryId = repositoryId,
+                Branch = branch,
                 Status = ScanRunStatus.Pending,
                 TriggeredAt = DateTime.UtcNow
             });

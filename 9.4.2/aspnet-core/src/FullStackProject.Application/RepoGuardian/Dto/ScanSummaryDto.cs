@@ -13,5 +13,6 @@ namespace FullStackProject.RepoGuardian.Dto
         public int? OverallScore { get; set; }
         public DateTime TriggeredAt { get; set; }
         public DateTime? CompletedAt { get; set; }
+        public string Branch { get; set; }
     }
 }

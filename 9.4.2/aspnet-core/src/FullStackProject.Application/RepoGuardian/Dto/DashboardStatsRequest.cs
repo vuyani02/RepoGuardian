@@ -15,5 +15,11 @@ namespace FullStackProject.RepoGuardian.Dto
         /// Defaults to true.
         /// </summary>
         public bool LatestPerRepo { get; set; } = true;
+
+        /// <summary>
+        /// When true (default), only scans on the main or master branch are included.
+        /// When false, scans on all branches are included.
+        /// </summary>
+        public bool DefaultBranchOnly { get; set; } = true;
     }
 }

@@ -26,5 +26,9 @@ namespace FullStackProject.Domains.RepoGuardian
         public string ErrorMessage { get; set; }
 
         public int? OverallScore { get; set; }
+
+        /// <summary>Branch that was scanned. Null for scans created before branch selection was introduced.</summary>
+        [MaxLength(250)]
+        public string Branch { get; set; }
     }
 }

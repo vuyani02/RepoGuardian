@@ -11,6 +11,7 @@ namespace FullStackProject.RepoGuardian.Dto
         public DateTime TriggeredAt { get; set; }
         public DateTime? CompletedAt { get; set; }
         public string ErrorMessage { get; set; }
+        public string Branch { get; set; }
         public List<ComplianceScoreDto> CategoryScores { get; set; } = new();
         public List<RuleResultDto> RuleResults { get; set; } = new();
         public List<RecommendationDto> Recommendations { get; set; } = new();

@@ -103,7 +103,7 @@ namespace FullStackProject.RepoGuardian
         /// </summary>
         public async Task<ScanResultDto> StartScanAsync(StartScanRequest request)
         {
-            var scanRun = await _repoGuardianManager.CreateScanRunAsync(request.RepositoryId);
+            var scanRun = await _repoGuardianManager.CreateScanRunAsync(request.RepositoryId, request.Branch);
 
             try
             {
@@ -142,6 +142,7 @@ namespace FullStackProject.RepoGuardian
                 ScanRunId = scanRun.Id,
                 Status = scanRun.Status.ToString(),
                 OverallScore = scanRun.OverallScore,
+                Branch = scanRun.Branch,
                 TriggeredAt = scanRun.TriggeredAt,
                 CompletedAt = scanRun.CompletedAt,
                 ErrorMessage = scanRun.ErrorMessage,
@@ -180,7 +181,8 @@ namespace FullStackProject.RepoGuardian
             var repositories = await _repositoryRepo.GetAllListAsync();
             var repoMap = repositories.ToDictionary(r => r.Id);
 
-            var dateFiltered = ApplyDateFilter(allScanRuns, request.DaysBack);
+            var branchFiltered = ApplyDefaultBranchFilter(allScanRuns, request.DefaultBranchOnly);
+            var dateFiltered = ApplyDateFilter(branchFiltered, request.DaysBack);
             var filtered = ApplyScopeFilter(dateFiltered, request.LatestPerRepo);
 
             var completedScores = filtered
@@ -210,10 +212,10 @@ namespace FullStackProject.RepoGuardian
                     ? Math.Round(completedScores.Average(), 1)
                     : null,
                 CategoryAverages = categoryAverages,
-                ReposBelowThreshold = ComputeReposBelowThreshold(allScanRuns),
-                MostRecentScan = ComputeMostRecentScan(allScanRuns, repoMap),
+                ReposBelowThreshold = ComputeReposBelowThreshold(branchFiltered),
+                MostRecentScan = ComputeMostRecentScan(branchFiltered, repoMap),
                 MostFailingRule = ComputeMostFailingRule(failedRuleResults),
-                TrendData = ComputeTrendData(allScanRuns, request.DaysBack)
+                TrendData = ComputeTrendData(branchFiltered, request.DaysBack)
             };
         }
 
@@ -325,11 +327,26 @@ namespace FullStackProject.RepoGuardian
                         Owner = repository.Owner,
                         Status = s.Status.ToString(),
                         OverallScore = s.OverallScore,
+                        Branch = s.Branch,
                         TriggeredAt = s.TriggeredAt,
                         CompletedAt = s.CompletedAt
                     })
                     .ToList()
             };
+        }
+
+        private static readonly HashSet<string> DefaultBranchNames = new(StringComparer.OrdinalIgnoreCase) { "main", "master" };
+
+        /// <summary>
+        /// When <paramref name="defaultBranchOnly"/> is true, keeps only scans on main/master
+        /// (or scans with no recorded branch, which predate branch selection).
+        /// </summary>
+        private static List<ScanRun> ApplyDefaultBranchFilter(List<ScanRun> scanRuns, bool defaultBranchOnly)
+        {
+            if (!defaultBranchOnly)
+                return scanRuns;
+
+            return [..scanRuns.Where(s => s.Branch == null || DefaultBranchNames.Contains(s.Branch))];
         }
 
         private static List<ScanRun> ApplyDateFilter(List<ScanRun> scanRuns, int? daysBack)
@@ -520,6 +537,7 @@ namespace FullStackProject.RepoGuardian
                         Owner = repo?.Owner ?? string.Empty,
                         Status = s.Status.ToString(),
                         OverallScore = s.OverallScore,
+                        Branch = s.Branch,
                         TriggeredAt = s.TriggeredAt,
                         CompletedAt = s.CompletedAt
                     };
