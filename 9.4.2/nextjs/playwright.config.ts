@@ -16,9 +16,9 @@ config({ path: resolve(__dirname, '.env.test.local') })
  *   TEST_PASSWORD=Test1234!
  */
 export const TEST_CREDS = {
-  teamName: process.env.TEST_TEAM_NAME ?? 'testteam',
-  username: process.env.TEST_USERNAME ?? 'testuser',
-  password: process.env.TEST_PASSWORD ?? 'Test1234!',
+  teamName: process.env.TEST_TEAM_NAME || 'testteam',
+  username: process.env.TEST_USERNAME || 'testuser',
+  password: process.env.TEST_PASSWORD || 'Test1234!',
 }
 
 export const STORAGE_STATE = 'tests/.auth/session.json'
