@@ -1,36 +1,113 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RepoGuardian — Frontend
 
-## Getting Started
+Next.js 16 frontend for RepoGuardian, a SaaS tool that scans public GitHub repositories for best-practice compliance and generates AI-powered reports with scores, rule results, and fix recommendations.
 
-First, run the development server:
+## Prerequisites
+
+- Node.js 20+
+- npm 10+
+- The backend API must be running (see `../aspnet-core/README.md`)
+
+## Setup
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure environment
+
+Copy the example env file and fill in the values:
+
+```bash
+cp .env.example .env.local
+```
+
+Open `.env.local` and set:
+
+```env
+# URL of the running ASP.NET Core backend
+API_URL=http://localhost:<backend-port>
+
+# Random secret used to sign session cookies — must be at least 32 characters
+SESSION_SECRET=replace-with-a-random-32-char-secret
+```
+
+## Running
+
+### Development
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open the URL shown in the terminal.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Production build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## Linting
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run lint
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tests
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Playwright end-to-end tests require both the backend and the frontend dev server to be running.
 
-## Deploy on Vercel
+### 1. Create a test credentials file
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+cp .env.test.local.example .env.test.local  # if an example exists, otherwise create it
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Or create `.env.test.local` manually:
+
+```env
+TEST_TEAM_NAME=your-test-team
+TEST_USERNAME=your-test-user
+TEST_PASSWORD=YourPassword123!
+```
+
+These credentials are created automatically on the first test run if they do not exist in the database.
+
+### 2. Install Playwright browsers
+
+```bash
+npx playwright install --with-deps chromium
+```
+
+### 3. Run the suite
+
+```bash
+npm test
+```
+
+Reports are saved to `playwright-report/`.
+
+## Project structure
+
+```
+src/
+  app/
+    (auth)/          # Login and register pages
+    (main)/          # Authenticated pages (dashboard, repositories, scans)
+    api/             # Next.js API routes — proxy to ASP.NET Core backend
+  components/        # UI components grouped by feature
+  providers/         # React context providers for data fetching
+  Types/             # TypeScript interfaces and types
+  lib/               # Server-side helpers (session, ABP API client, DAL)
+```
+
+## Environment variables reference
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `API_URL` | Yes | Base URL of the ASP.NET Core backend |
+| `SESSION_SECRET` | Yes | Secret for signing JWE session cookies (min 32 chars) |
